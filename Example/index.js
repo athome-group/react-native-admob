@@ -1,101 +1,112 @@
-import React, { Component } from 'react';
-import {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  View,
-  Platform,
-  TouchableHighlight,
-  Button,
-  ScrollView,
-} from 'react-native';
-
 import {
   AdMobBanner,
-  AdMobRewarded,
   AdMobInterstitial,
-  PublisherBanner,
-} from 'react-native-admob';
+  AdMobRewarded,
+  DFPNativeAds,
+  PublisherBanner
+} from "react-native-admob";
+import {
+  AppRegistry,
+  Button,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableHighlight,
+  View
+} from "react-native";
+import React, { Component } from "react";
 
 const BannerExample = ({ style, title, children, ...props }) => (
   <View {...props} style={[styles.example, style]}>
     <Text style={styles.title}>{title}</Text>
-    <View>
-      {children}
-    </View>
+    <View>{children}</View>
   </View>
 );
 
 const bannerWidths = [200, 250, 320];
 
 export default class Example extends Component {
-
   constructor() {
     super();
     this.state = {
-      fluidSizeIndex: 0,
+      fluidSizeIndex: 0
     };
   }
 
   componentDidMount() {
     AdMobRewarded.setTestDevices([AdMobRewarded.simulatorId]);
-    AdMobRewarded.setAdUnitID('ca-app-pub-3940256099942544/5224354917');
+    AdMobRewarded.setAdUnitID("ca-app-pub-3940256099942544/5224354917");
 
-    AdMobRewarded.addEventListener('rewarded',
-      (reward) => console.log('AdMobRewarded => rewarded', reward)
+    AdMobRewarded.addEventListener("rewarded", reward =>
+      console.log("AdMobRewarded => rewarded", reward)
     );
-    AdMobRewarded.addEventListener('adLoaded',
-      () => console.log('AdMobRewarded => adLoaded')
+    AdMobRewarded.addEventListener("adLoaded", () =>
+      console.log("AdMobRewarded => adLoaded")
     );
-    AdMobRewarded.addEventListener('adFailedToLoad',
-      (error) => console.warn(error)
+    AdMobRewarded.addEventListener("adFailedToLoad", error =>
+      console.warn(error)
     );
-    AdMobRewarded.addEventListener('adOpened',
-      () => console.log('AdMobRewarded => adOpened')
+    AdMobRewarded.addEventListener("adOpened", () =>
+      console.log("AdMobRewarded => adOpened")
     );
-    AdMobRewarded.addEventListener('videoStarted',
-      () => console.log('AdMobRewarded => videoStarted')
+    AdMobRewarded.addEventListener("videoStarted", () =>
+      console.log("AdMobRewarded => videoStarted")
     );
-    AdMobRewarded.addEventListener('adClosed',
-      () => {
-        console.log('AdMobRewarded => adClosed');
-        AdMobRewarded.requestAd().catch(error => console.warn(error));
-      }
-    );
-    AdMobRewarded.addEventListener('adLeftApplication',
-      () => console.log('AdMobRewarded => adLeftApplication')
+    AdMobRewarded.addEventListener("adClosed", () => {
+      console.log("AdMobRewarded => adClosed");
+      AdMobRewarded.requestAd().catch(error => console.warn(error));
+    });
+    AdMobRewarded.addEventListener("adLeftApplication", () =>
+      console.log("AdMobRewarded => adLeftApplication")
     );
 
     AdMobRewarded.requestAd().catch(error => console.warn(error));
 
     AdMobInterstitial.setTestDevices([AdMobInterstitial.simulatorId]);
-    AdMobInterstitial.setAdUnitID('ca-app-pub-3940256099942544/1033173712');
+    AdMobInterstitial.setAdUnitID("ca-app-pub-3940256099942544/1033173712");
 
-    AdMobInterstitial.addEventListener('adLoaded',
-      () => console.log('AdMobInterstitial adLoaded')
+    AdMobInterstitial.addEventListener("adLoaded", () =>
+      console.log("AdMobInterstitial adLoaded")
     );
-    AdMobInterstitial.addEventListener('adFailedToLoad',
-      (error) => console.warn(error)
+    AdMobInterstitial.addEventListener("adFailedToLoad", error =>
+      console.warn(error)
     );
-    AdMobInterstitial.addEventListener('adOpened',
-      () => console.log('AdMobInterstitial => adOpened')
+    AdMobInterstitial.addEventListener("adOpened", () =>
+      console.log("AdMobInterstitial => adOpened")
     );
-    AdMobInterstitial.addEventListener('adClosed',
-      () => {
-        console.log('AdMobInterstitial => adClosed');
-        AdMobInterstitial.requestAd().catch(error => console.warn(error));
-      }
-    );
-    AdMobInterstitial.addEventListener('adLeftApplication',
-      () => console.log('AdMobInterstitial => adLeftApplication')
+    AdMobInterstitial.addEventListener("adClosed", () => {
+      console.log("AdMobInterstitial => adClosed");
+      AdMobInterstitial.requestAd().catch(error => console.warn(error));
+    });
+    AdMobInterstitial.addEventListener("adLeftApplication", () =>
+      console.log("AdMobInterstitial => adLeftApplication")
     );
 
     AdMobInterstitial.requestAd().catch(error => console.warn(error));
+
+    // DFPNativeAds.setTestDevices([DFPNativeAds.simulatorId]);
+    DFPNativeAds.setAdUnitID(
+      //"/6499/example/native"
+      "/30879737/test4.lu_servicessuggeres/test4.lu_fichedetail_smartphone_louer_servicessuggeres_1"
+    );
+    DFPNativeAds.setTemplateIDs(["11746836"]); //(["10104090"]);
+    DFPNativeAds.setCustomTargeting({ Langue: "EN" });
+    DFPNativeAds.addEventListener("adLoaded", ad =>
+      console.log("DFPNativeAds adLoaded: ", ad)
+    );
+    DFPNativeAds.addEventListener("adFailedToLoad", error =>
+      console.log(error)
+    );
+    DFPNativeAds.addEventListener("adStartLoading", targting =>
+      console.log("staring loading with targeting: ", targting)
+    );
   }
 
   componentWillUnmount() {
     AdMobRewarded.removeAllListeners();
     AdMobInterstitial.removeAllListeners();
+    DFPNativeAds.removeAllListeners();
   }
 
   showRewarded() {
@@ -104,6 +115,15 @@ export default class Example extends Component {
 
   showInterstitial() {
     AdMobInterstitial.showAd().catch(error => console.warn(error));
+  }
+
+  requestNativeAd() {
+    DFPNativeAds.requestAd()
+      .then(ad => alert(JSON.stringify(ad)))
+      .catch(error => alert(error));
+    DFPNativeAds.isNativeAdLoading(loading =>
+      console.log("isNativeLoading: ", loading)
+    );
   }
 
   render() {
@@ -147,7 +167,7 @@ export default class Example extends Component {
           <BannerExample title="DFP - Multiple Ad Sizes">
             <PublisherBanner
               adSize="banner"
-              validAdSizes={['banner', 'largeBanner', 'mediumRectangle']}
+              validAdSizes={["banner", "largeBanner", "mediumRectangle"]}
               adUnitID="/6499/example/APIDemo/AdSizes"
               ref={el => (this._adSizesExample = el)}
             />
@@ -156,15 +176,18 @@ export default class Example extends Component {
               onPress={() => this._adSizesExample.loadBanner()}
             />
           </BannerExample>
-          <BannerExample title="DFP - App Events" style={this.state.appEventsExampleStyle}>
+          <BannerExample
+            title="DFP - App Events"
+            style={this.state.appEventsExampleStyle}
+          >
             <PublisherBanner
               style={{ height: 50 }}
               adUnitID="/6499/example/APIDemo/AppEvents"
-              onAdFailedToLoad={(error) => console.warn(error)}
-              onAppEvent={(event) => {
-                if (event.name === 'color') {
+              onAdFailedToLoad={error => console.warn(error)}
+              onAppEvent={event => {
+                if (event.name === "color") {
                   this.setState({
-                    appEventsExampleStyle: { backgroundColor: event.info },
+                    appEventsExampleStyle: { backgroundColor: event.info }
                   });
                 }
               }}
@@ -179,8 +202,8 @@ export default class Example extends Component {
           <BannerExample title="DFP - Fluid Ad Size">
             <View
               style={[
-                { backgroundColor: '#f3f', paddingVertical: 10 },
-                this.state.fluidAdSizeExampleStyle,
+                { backgroundColor: "#f3f", paddingVertical: 10 },
+                this.state.fluidAdSizeExampleStyle
               ]}
             >
               <PublisherBanner
@@ -192,16 +215,29 @@ export default class Example extends Component {
             </View>
             <Button
               title="Change Banner Width"
-              onPress={() => this.setState(prevState => ({
-                fluidSizeIndex: prevState.fluidSizeIndex + 1,
-                fluidAdSizeExampleStyle: { width: bannerWidths[prevState.fluidSizeIndex % bannerWidths.length] },
-              }))}
+              onPress={() =>
+                this.setState(prevState => ({
+                  fluidSizeIndex: prevState.fluidSizeIndex + 1,
+                  fluidAdSizeExampleStyle: {
+                    width:
+                      bannerWidths[
+                        prevState.fluidSizeIndex % bannerWidths.length
+                      ]
+                  }
+                }))
+              }
               style={styles.button}
             />
             <Button
               title="Reload"
               onPress={() => this._appFluidAdSizeExample.loadBanner()}
               style={styles.button}
+            />
+          </BannerExample>
+          <BannerExample title="DFP - native ads">
+            <Button
+              title="fetch custom rendering"
+              onPress={this.requestNativeAd}
             />
           </BannerExample>
         </ScrollView>
@@ -212,15 +248,15 @@ export default class Example extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: (Platform.OS === 'ios') ? 30 : 10,
+    marginTop: Platform.OS === "ios" ? 30 : 10
   },
   example: {
-    paddingVertical: 10,
+    paddingVertical: 10
   },
   title: {
     margin: 10,
-    fontSize: 20,
-  },
+    fontSize: 20
+  }
 });
 
-AppRegistry.registerComponent('Example', () => Example);
+AppRegistry.registerComponent("Example", () => Example);

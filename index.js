@@ -1,6 +1,13 @@
-import AdMobBanner from './RNAdMobBanner';
-import AdMobInterstitial from './RNAdMobInterstitial';
-import PublisherBanner from './RNPublisherBanner';
-import AdMobRewarded from './RNAdMobRewarded';
+import AdMobBanner from "./RNAdMobBanner";
+import AdMobInterstitial from "./RNAdMobInterstitial";
+import AdMobRewarded from "./RNAdMobRewarded";
+import DFPNativeAds from "./RNDFPNativeAds";
+import PublisherBanner from "./RNPublisherBanner";
 
-export { AdMobBanner, AdMobInterstitial, PublisherBanner, AdMobRewarded };
+export {
+  AdMobBanner,
+  AdMobInterstitial,
+  PublisherBanner,
+  AdMobRewarded,
+  DFPNativeAds
+};

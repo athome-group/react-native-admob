@@ -3,7 +3,6 @@ import { NativeEventEmitter, NativeModules } from "react-native";
 import { createErrorFromErrorData } from "./utils";
 
 const RNDFPNativeAds = NativeModules.RNDFPNativeAds;
-console.log(RNDFPNativeAds);
 
 const eventEmitter = new NativeEventEmitter(RNDFPNativeAds);
 
@@ -27,7 +26,6 @@ const addEventListener = (event, handler) => {
       listener = eventEmitter.addListener(mappedEvent, handler);
     }
     _subscriptions.set(handler, listener);
-    console.log("listner: ", listener);
     return {
       remove: () => removeEventListener(event, handler)
     };

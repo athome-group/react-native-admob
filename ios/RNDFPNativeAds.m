@@ -9,17 +9,31 @@
 static NSString *const kEventAdLoaded = @"nativeCustomTemplateAdLoaded";
 static NSString *const kEventAdFailedToLoad = @"nativeCustomTemplateAdFailedToLoad";
 static NSString *const kEventAdStartLoading = @"nativeCustomTemplateAdStartLoading";
+static NSString *const kEventAllAdsFinished = @"nativeCustomTemplateAllAdsFinished";
+
+static NSString *const kAdUnitID = @"adUnitID";
 
 @implementation RNDFPNativeAds {
-    GADNativeCustomTemplateAd  *_nativeCustomTemplateAd;
-    GADAdLoader *_adLoader;
-    NSString *_adUnitID;
+    NSMutableDictionary *_nativeCustomTemplateAds;
+    NSMutableDictionary *_convertedAds;
+    NSMutableDictionary<NSString *, GADAdLoader *> *_adLoaders;
+    NSArray<NSString *> *_adUnitIDs;
     NSArray *_templateIDs;
     NSArray *_testDevices;
     NSDictionary *_customTargeting;
-    RCTPromiseResolveBlock _requestAdResolve;
-    RCTPromiseRejectBlock _requestAdReject;
+    RCTPromiseResolveBlock _requestAdsResolve;
+    RCTPromiseRejectBlock _requestAdsReject;
     BOOL hasListeners;
+}
+
+- (instancetype)init
+{
+    if ((self = [super init])) {
+        _nativeCustomTemplateAds = @{}.mutableCopy;
+        _convertedAds = @{}.mutableCopy;
+        _adLoaders = @{}.mutableCopy;
+    }
+    return self;
 }
 
 - (dispatch_queue_t)methodQueue
@@ -39,15 +53,16 @@ RCT_EXPORT_MODULE();
     return @[
              kEventAdLoaded,
              kEventAdFailedToLoad,
-             kEventAdStartLoading
+             kEventAdStartLoading,
+             kEventAllAdsFinished
              ];
 }
 
 #pragma mark exported methods
 
-RCT_EXPORT_METHOD(setAdUnitID:(NSString *)adUnitID)
+RCT_EXPORT_METHOD(setAdUnitIDs:(NSArray *)adUnitIDs)
 {
-    _adUnitID = adUnitID;
+    _adUnitIDs = adUnitIDs;
 }
 
 RCT_EXPORT_METHOD(setTestDevices:(NSArray *)testDevices)
@@ -65,40 +80,52 @@ RCT_EXPORT_METHOD(setCustomTargeting:(NSDictionary *)customTargeting)
     _customTargeting = customTargeting;
 }
 
-RCT_EXPORT_METHOD(performClickOnAsset:(NSString *)assetKey)
+RCT_EXPORT_METHOD(performClickOnAsset:(NSString *)assetKey unitID:(NSString *)unitID)
 {
-    [_nativeCustomTemplateAd performClickOnAssetWithKey:assetKey];
+    [_nativeCustomTemplateAds[unitID] performClickOnAssetWithKey:assetKey];
 }
 
-RCT_EXPORT_METHOD(isNativeAdLoading:(RCTResponseSenderBlock)callback)
+RCT_EXPORT_METHOD(isNativeAdLoading:(NSString *)unitID with:(RCTResponseSenderBlock)callback)
 {
-    callback(@[@(_adLoader.isLoading)]);
+    callback(@[@(_adLoaders[unitID].isLoading)]);
 }
 
-RCT_EXPORT_METHOD(requestAd:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXPORT_METHOD(requestAds:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
-    _requestAdResolve = resolve;
-    _requestAdReject = reject;
-    
-    GADMultipleAdsAdLoaderOptions *multipleAdsOptions = [[GADMultipleAdsAdLoaderOptions alloc] init];
-    multipleAdsOptions.numberOfAds = 1;
-    
-    GADNativeAdImageAdLoaderOptions *imageAdLoaderOptions = [[GADNativeAdImageAdLoaderOptions alloc] init];
-    imageAdLoaderOptions.disableImageLoading = true;
-    
-    _adLoader = [[GADAdLoader alloc] initWithAdUnitID:_adUnitID
-                                   rootViewController:[[UIViewController alloc] init]
-                                              adTypes:@[kGADAdLoaderAdTypeNativeCustomTemplate]
-                                              options:@[multipleAdsOptions, imageAdLoaderOptions]];
-    _adLoader.delegate = self;
-    
-    DFPRequest *request = [DFPRequest request];
-    request.testDevices = _testDevices;
-    request.customTargeting = _customTargeting;
-    [_adLoader loadRequest:request];
-    
-    if (hasListeners) {
-        [self sendEventWithName:kEventAdStartLoading body:nil];
+    if ([self allRequestsFinished]) {
+        [_nativeCustomTemplateAds removeAllObjects];
+        [_convertedAds removeAllObjects];
+        [_adLoaders removeAllObjects];
+        
+        _requestAdsResolve = resolve;
+        _requestAdsReject = reject;
+        
+        GADMultipleAdsAdLoaderOptions *multipleAdsOptions = [[GADMultipleAdsAdLoaderOptions alloc] init];
+        multipleAdsOptions.numberOfAds = 1;
+        
+        GADNativeAdImageAdLoaderOptions *imageAdLoaderOptions = [[GADNativeAdImageAdLoaderOptions alloc] init];
+        imageAdLoaderOptions.disableImageLoading = true;
+        
+        for (NSString *adUnitID in _adUnitIDs) {
+            GADAdLoader *adLoader = [[GADAdLoader alloc] initWithAdUnitID:adUnitID
+                                                       rootViewController:[[UIViewController alloc] init]
+                                                                  adTypes:@[kGADAdLoaderAdTypeNativeCustomTemplate]
+                                                                  options:@[multipleAdsOptions, imageAdLoaderOptions]];
+            [_adLoaders setObject:adLoader forKey:adUnitID];
+            adLoader.delegate = self;
+            
+            DFPRequest *request = [DFPRequest request];
+            request.testDevices = _testDevices;
+            request.customTargeting = _customTargeting;
+            [adLoader loadRequest:request];
+            
+            if (hasListeners) {
+                [self sendEventWithName:kEventAdStartLoading body:@{kAdUnitID : adUnitID}];
+            }
+            
+        }
+    } else {
+        reject(@"E_ADS_ALREADY_LOADING", @"Ads are already loading.", nil);
     }
     
 }
@@ -124,7 +151,7 @@ RCT_EXPORT_METHOD(requestAd:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromise
 
 - (void)adLoader:(GADAdLoader *)adLoader
 didReceiveNativeCustomTemplateAd:(GADNativeCustomTemplateAd *)nativeCustomTemplateAd {
-    _nativeCustomTemplateAd = nativeCustomTemplateAd;
+    [_nativeCustomTemplateAds setObject:nativeCustomTemplateAd?:[NSNull null] forKey:adLoader.adUnitID];
     
     NSMutableDictionary *ad = @{}.mutableCopy;
     
@@ -136,12 +163,20 @@ didReceiveNativeCustomTemplateAd:(GADNativeCustomTemplateAd *)nativeCustomTempla
             [ad setValue:[[nativeCustomTemplateAd imageForKey:key] imageURL].absoluteString forKey:key];
         }
     }
+    [_convertedAds setObject:ad forKey:adLoader.adUnitID];
     
     if (hasListeners) {
-        [self sendEventWithName:kEventAdLoaded body:ad];
+        [self sendEventWithName:kEventAdLoaded body:@{kAdUnitID: adLoader.adUnitID, @"ad":ad}];
     }
-    _requestAdResolve(ad);
-    [_nativeCustomTemplateAd recordImpression];
+    
+    [nativeCustomTemplateAd recordImpression];
+    
+    if (_nativeCustomTemplateAds.allKeys.count == _adUnitIDs.count) {
+        _requestAdsResolve(_convertedAds);
+        if (hasListeners) {
+            [self sendEventWithName:kEventAllAdsFinished body:@{@"ads":_convertedAds}];
+        }
+    }
 }
 
 - (NSArray *)nativeCustomTemplateIDsForAdLoader:(GADAdLoader *)adLoader {
@@ -152,11 +187,45 @@ didReceiveNativeCustomTemplateAd:(GADNativeCustomTemplateAd *)nativeCustomTempla
 #pragma mark GADAdLoaderDelegate implementation
 
 - (void)adLoader:(GADAdLoader *)adLoader didFailToReceiveAdWithError:(GADRequestError *)error {
+    
+    NSDictionary *jsError = RCTJSErrorFromCodeMessageAndNSError(@"E_AD_REQUEST_FAILED", error.localizedDescription, error);
     if (hasListeners) {
-        NSDictionary *jsError = RCTJSErrorFromCodeMessageAndNSError(@"E_AD_REQUEST_FAILED", error.localizedDescription, error);
-        [self sendEventWithName:kEventAdFailedToLoad body:jsError];
+        [self sendEventWithName:kEventAdFailedToLoad body:@{kAdUnitID: adLoader.adUnitID, @"error":jsError}];
     }
-    _requestAdReject(@"E_AD_REQUEST_FAILED", error.localizedDescription, error);
+    // TODO: can set in both dictionaries the error object
+    [_nativeCustomTemplateAds setObject:[NSNull null] forKey:adLoader.adUnitID];
+    [_convertedAds setObject:@{} forKey:adLoader.adUnitID];
+    
+    if ([self allAdsFailed]) {
+        _requestAdsReject(@"E_ADS_REQUEST_FAILED", error.localizedDescription, error);
+        if (hasListeners) {
+            [self sendEventWithName:kEventAllAdsFinished body:jsError];
+        }
+    }
+}
+
+#pragma mark Helper
+
+- (BOOL)allRequestsFinished {
+    for (GADAdLoader *loader in _adLoaders.allValues) {
+        if (loader.isLoading) {
+            return false;
+        }
+    }
+    return true;
+}
+
+- (BOOL)allAdsFailed {
+    if (_nativeCustomTemplateAds.allValues.count != _adUnitIDs.count) {
+        return false;
+    }
+    
+    for (GADNativeCustomTemplateAd *ad in _nativeCustomTemplateAds.allValues) {
+        if (![ad isEqual:[NSNull null]]) {
+            return false;
+        }
+    }
+    return true;
 }
 
 @end

@@ -9,7 +9,8 @@ const eventEmitter = new NativeEventEmitter(RNDFPNativeAds);
 const eventMap = {
   adLoaded: "nativeCustomTemplateAdLoaded",
   adFailedToLoad: "nativeCustomTemplateAdFailedToLoad",
-  adStartLoading: "nativeCustomTemplateAdStartLoading"
+  adStartLoading: "nativeCustomTemplateAdStartLoading",
+  allAdsFinished: "nativeCustomTemplateAllAdsFinished"
 };
 
 const _subscriptions = new Map();

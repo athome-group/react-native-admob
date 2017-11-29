@@ -86,20 +86,31 @@ export default class Example extends Component {
     AdMobInterstitial.requestAd().catch(error => console.warn(error));
 
     // DFPNativeAds.setTestDevices([DFPNativeAds.simulatorId]);
-    DFPNativeAds.setAdUnitID(
+    DFPNativeAds.setAdUnitIDs(
       //"/6499/example/native"
-      "/30879737/test4.lu_servicessuggeres/test4.lu_fichedetail_smartphone_louer_servicessuggeres_1"
+      [
+        "/30879737/test4.lu_servicessuggeres/test4.lu_fichedetail_smartphone_louer_servicessuggeres_1",
+        "/30879737/test4.lu_servicessuggeres/test4.lu_fichedetail_smartphone_louer_servicessuggeres_2",
+        "/30879737/test4.lu_servicessuggeres/test4.lu_fichedetail_smartphone_louer_servicessuggeres_3"
+      ]
     );
     DFPNativeAds.setTemplateIDs(["11746836"]); //(["10104090"]);
-    DFPNativeAds.setCustomTargeting({ Langue: "EN" });
-    DFPNativeAds.addEventListener("adLoaded", ad =>
-      console.log("DFPNativeAds adLoaded: ", ad)
+    DFPNativeAds.setCustomTargeting({ Langue: "FR" });
+    DFPNativeAds.addEventListener("adLoaded", body =>
+      console.log("DFPNativeAds adLoaded: ", body)
     );
-    DFPNativeAds.addEventListener("adFailedToLoad", error =>
-      console.log(error)
+    DFPNativeAds.addEventListener("adFailedToLoad", body =>
+      console.log(
+        "DFPNativeAds failed to load: ",
+        body["adUnitID"],
+        body["error"]
+      )
     );
-    DFPNativeAds.addEventListener("adStartLoading", targting =>
-      console.log("staring loading with targeting: ", targting)
+    DFPNativeAds.addEventListener("adStartLoading", id =>
+      console.log("DFPNativeAds staring loading with id: ", id)
+    );
+    DFPNativeAds.addEventListener("allAdsFinished", body =>
+      console.log("DFPNativeAds all finished: ", body)
     );
   }
 
@@ -118,11 +129,21 @@ export default class Example extends Component {
   }
 
   requestNativeAd() {
-    DFPNativeAds.requestAd()
-      .then(ad => alert(JSON.stringify(ad)))
+    DFPNativeAds.requestAds()
+      .then(ads => {
+        let text = "";
+        for (const key in ads) {
+          if (ads.hasOwnProperty(key)) {
+            const element = ads[key];
+            text = text.concat("\n", key, ": ", element["Titre"]);
+          }
+        }
+        alert(`DFPNativeAds:\n ${text}`);
+      })
       .catch(error => alert(error));
-    DFPNativeAds.isNativeAdLoading(loading =>
-      console.log("isNativeLoading: ", loading)
+    DFPNativeAds.isNativeAdLoading(
+      "/30879737/test4.lu_servicessuggeres/test4.lu_fichedetail_smartphone_louer_servicessuggeres_1",
+      loading => console.log("isNativeLoading = DFPNativeAds 1: ", loading)
     );
   }
 

@@ -86,38 +86,13 @@ export default class Example extends Component {
     AdMobInterstitial.requestAd().catch(error => console.warn(error));
 
     // DFPNativeAds.setTestDevices([DFPNativeAds.simulatorId]);
-    DFPNativeAds.setAdUnitIDs(
-      //"/6499/example/native"
-      [
-        "/30879737/test4.lu_servicessuggeres/test4.lu_fichedetail_smartphone_louer_servicessuggeres_1",
-        "/30879737/test4.lu_servicessuggeres/test4.lu_fichedetail_smartphone_louer_servicessuggeres_2",
-        "/30879737/test4.lu_servicessuggeres/test4.lu_fichedetail_smartphone_louer_servicessuggeres_3"
-      ]
-    );
     DFPNativeAds.setTemplateIDs(["11746836"]); //(["10104090"]);
     DFPNativeAds.setCustomTargeting({ Langue: "FR" });
-    DFPNativeAds.addEventListener("adLoaded", body =>
-      console.log("DFPNativeAds adLoaded: ", body)
-    );
-    DFPNativeAds.addEventListener("adFailedToLoad", body =>
-      console.log(
-        "DFPNativeAds failed to load: ",
-        body["adUnitID"],
-        body["error"]
-      )
-    );
-    DFPNativeAds.addEventListener("adStartLoading", id =>
-      console.log("DFPNativeAds staring loading with id: ", id)
-    );
-    DFPNativeAds.addEventListener("allAdsFinished", body =>
-      console.log("DFPNativeAds all finished: ", body)
-    );
   }
 
   componentWillUnmount() {
     AdMobRewarded.removeAllListeners();
     AdMobInterstitial.removeAllListeners();
-    DFPNativeAds.removeAllListeners();
   }
 
   showRewarded() {
@@ -129,7 +104,29 @@ export default class Example extends Component {
   }
 
   requestNativeAd() {
-    DFPNativeAds.requestAds()
+    // PDP
+    const PDPRequestKey = "PDP";
+    const result = DFPNativeAds.addEventListener(
+      PDPRequestKey,
+      "adLoaded",
+      body => console.log("PDP adLoaded: ", body)
+    );
+    result["remove"]();
+    DFPNativeAds.addEventListener(PDPRequestKey, "adFailedToLoad", body =>
+      console.log("PDP failed to load: ", body["adUnitID"], body["error"])
+    );
+    DFPNativeAds.addEventListener(PDPRequestKey, "adStartLoading", id =>
+      console.log("PDP staring loading with id: ", id)
+    );
+    DFPNativeAds.addEventListener(PDPRequestKey, "allAdsFinished", body =>
+      console.log("PDP all finished: ", body)
+    );
+
+    DFPNativeAds.requestAds(PDPRequestKey, [
+      "/30879737/test4.lu_servicessuggeres/test4.lu_fichedetail_smartphone_louer_servicessuggeres_1",
+      "/30879737/test4.lu_servicessuggeres/test4.lu_fichedetail_smartphone_louer_servicessuggeres_2",
+      "/30879737/test4.lu_servicessuggeres/test4.lu_fichedetail_smartphone_louer_servicessuggeres_3"
+    ])
       .then(ads => {
         let text = "";
         for (const key in ads) {
@@ -138,12 +135,94 @@ export default class Example extends Component {
             text = text.concat("\n", key, ": ", element["Titre"]);
           }
         }
-        alert(`DFPNativeAds:\n ${text}`);
+        alert(`PDP:\n ${text}`);
+        DFPNativeAds.removeAllListeners(PDPRequestKey);
       })
-      .catch(error => alert(error));
+      .catch(error => {
+        alert(`PDP:\n ${error}`);
+        DFPNativeAds.removeAllListeners(PDPRequestKey);
+      });
     DFPNativeAds.isNativeAdLoading(
-      "/30879737/test4.lu_servicessuggeres/test4.lu_fichedetail_smartphone_louer_servicessuggeres_1",
-      loading => console.log("isNativeLoading = DFPNativeAds 1: ", loading)
+      PDPRequestKey,
+      "/30879737/test4.lu_servicessuggeres/test4.lu_fichedetail_smartphone_louer_servicessuggeres_3",
+      loading => console.log("isNativeLoading = PDP 3: ", loading)
+    );
+
+    // Home
+    const HomeRequestKey = "Home";
+    DFPNativeAds.addEventListener(HomeRequestKey, "adLoaded", body =>
+      console.log("Home adLoaded: ", body)
+    );
+    DFPNativeAds.addEventListener(HomeRequestKey, "adFailedToLoad", body =>
+      console.log("Home failed to load: ", body)
+    );
+    DFPNativeAds.addEventListener(HomeRequestKey, "adStartLoading", id =>
+      console.log("Home staring loading with id: ", id)
+    );
+    DFPNativeAds.addEventListener(HomeRequestKey, "allAdsFinished", body =>
+      console.log("Home all finished: ", body)
+    );
+
+    DFPNativeAds.requestAds(HomeRequestKey, [
+      "/30879737/test4.lu_servicessuggeres/test4.lu_homepage_smartphone_acheter_servicessuggeres_4",
+      "/30879737/test4.lu_servicessuggeres/test4.lu_homepage_smartphone_acheter_servicessuggeres_2",
+      "/30879737/test4.lu_servicessuggeres/test4.lu_homepage_smartphone_acheter_servicessuggeres_3"
+    ])
+      .then(ads => {
+        let text = "";
+        for (const key in ads) {
+          if (ads.hasOwnProperty(key)) {
+            const element = ads[key];
+            text = text.concat("\n", key, ": ", element["Titre"]);
+          }
+        }
+        alert(`Home:\n ${text}`);
+
+        DFPNativeAds.removeAllListeners(HomeRequestKey);
+      })
+      .catch(error => {
+        alert(`Home ${error}`);
+
+        DFPNativeAds.removeAllListeners(HomeRequestKey);
+      });
+    DFPNativeAds.isNativeAdLoading(
+      HomeRequestKey,
+      "/30879737/test4.lu_servicessuggeres/test4.lu_homepage_smartphone_acheter_servicessuggeres_2",
+      loading => console.log("isNativeLoading = Home: ", loading)
+    );
+
+    // PDP 2
+    // DFPNativeAds.addEventListener(PDPRequestKey, "adLoaded", body =>
+    //   console.log("PDP 2 adLoaded: ", body)
+    // );
+    // DFPNativeAds.addEventListener(PDPRequestKey, "adFailedToLoad", body =>
+    //   console.log("PDP 2 failed to load: ", body["adUnitID"], body["error"])
+    // );
+    // DFPNativeAds.addEventListener(PDPRequestKey, "adStartLoading", id =>
+    //   console.log("PDP 2 staring loading with id: ", id)
+    // );
+    // DFPNativeAds.addEventListener(PDPRequestKey, "allAdsFinished", body =>
+    //   console.log("PDP 2 all finished: ", body)
+    // );
+    DFPNativeAds.requestAds(PDPRequestKey, [
+      "/30879737/test4.lu_servicessuggeres/test4.lu_fichedetail_smartphone_louer_servicessuggeres_3",
+      "/30879737/test4.lu_servicessuggeres/test4.lu_fichedetail_smartphone_louer_servicessuggeres_4"
+    ])
+      .then(ads => {
+        let text = "";
+        for (const key in ads) {
+          if (ads.hasOwnProperty(key)) {
+            const element = ads[key];
+            text = text.concat("\n", key, ": ", element["Titre"]);
+          }
+        }
+        alert(`PDP 2:\n ${text}`);
+      })
+      .catch(error => alert(`PDP 2:\n ${error}`));
+    DFPNativeAds.isNativeAdLoading(
+      PDPRequestKey,
+      "/30879737/test4.lu_servicessuggeres/test4.lu_fichedetail_smartphone_louer_servicessuggeres_3",
+      loading => console.log("isNativeLoading = PDP 2 - id 3: ", loading)
     );
   }
 

@@ -52,7 +52,8 @@
 #pragma clang diagnostic pop
 
 - (void)loadBanner {
-    GADRequest *request = [GADRequest request];
+    DFPRequest *request = [DFPRequest request];
+    request.customTargeting = _customTargeting;
     request.testDevices = _testDevices;
     [_bannerView loadRequest:request];
 }

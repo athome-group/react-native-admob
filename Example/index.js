@@ -302,14 +302,53 @@ export default class Example extends Component {
           <BannerExample title="DFP - Fluid Ad Size">
             <View
               style={[
-                { backgroundColor: "#f3f", paddingVertical: 10 },
+                {
+                  // backgroundColor: "#f3f",
+                  paddingVertical: 10,
+                  paddingHorizontal: 20
+                },
                 this.state.fluidAdSizeExampleStyle
               ]}
             >
               <PublisherBanner
                 adSize="fluid"
-                adUnitID="/6499/example/APIDemo/Fluid"
+                customTargeting={{ Langue: "FR" }}
+                adUnitID="/30879737/test4.lu_servicessuggeres/test4.lu_fichedetail_smartphone_acheter_servicessuggeres_1" //"/6499/example/APIDemo/Fluid"
                 ref={el => (this._appFluidAdSizeExample = el)}
+                style={{ flex: 1 }}
+              />
+            </View>
+            <View
+              style={[
+                {
+                  // backgroundColor: "#f3f",
+                  paddingVertical: 10,
+                  paddingHorizontal: 20
+                },
+                this.state.fluidAdSizeExampleStyle
+              ]}
+            >
+              <PublisherBanner
+                adSize="fluid"
+                customTargeting={{ Langue: "FR" }}
+                adUnitID="/30879737/test4.lu_servicessuggeres/test4.lu_fichedetail_smartphone_acheter_servicessuggeres_2" //"/6499/example/APIDemo/Fluid"
+                style={{ flex: 1 }}
+              />
+            </View>
+            <View
+              style={[
+                {
+                  // backgroundColor: "#f3f",
+                  paddingVertical: 10,
+                  paddingHorizontal: 20
+                },
+                this.state.fluidAdSizeExampleStyle
+              ]}
+            >
+              <PublisherBanner
+                adSize="fluid"
+                customTargeting={{ Langue: "EN" }}
+                adUnitID="/30879737/test4.lu_servicessuggeres/test4.lu_fichedetail_smartphone_acheter_servicessuggeres_3" //"/6499/example/APIDemo/Fluid"
                 style={{ flex: 1 }}
               />
             </View>

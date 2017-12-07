@@ -17,7 +17,8 @@ public class RNAdMobPackage implements ReactPackage {
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         return Arrays.<NativeModule>asList(
             new RNAdMobInterstitialAdModule(reactContext),
-            new RNAdMobRewardedVideoAdModule(reactContext)
+            new RNAdMobRewardedVideoAdModule(reactContext),
+            new RNDFPNativeAdsModule(reactContext)
         );
     }
 
@@ -31,6 +32,6 @@ public class RNAdMobPackage implements ReactPackage {
       return Arrays.<ViewManager>asList(
           new RNAdMobBannerViewManager(),
           new RNPublisherBannerViewManager()
-      );
+          );
     }
 }

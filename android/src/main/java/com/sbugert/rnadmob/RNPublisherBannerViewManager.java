@@ -7,7 +7,7 @@ import android.view.View;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.bridge.ReadbleMap;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableNativeMap;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableNativeArray;
@@ -24,10 +24,14 @@ import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
 
+
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Iterator;
+
+
 
 class ReactPublisherAdView extends ReactViewGroup implements AppEventListener {
 
@@ -37,21 +41,20 @@ class ReactPublisherAdView extends ReactViewGroup implements AppEventListener {
     AdSize[] validAdSizes;
     String adUnitID;
     AdSize adSize;
-    HashMap<String, String> customTargeting;
-
+    Map<String, Object> customTargeting;
 
     public ReactPublisherAdView(final Context context) {
         super(context);
         this.createAdView();
     }
 
-    private void createAdView() {
+     private void createAdView() {
         if (this.adView != null) this.adView.destroy();
 
         final Context context = getContext();
         this.adView = new PublisherAdView(context);
         this.adView.setAppEventListener(this);
-        this.adView.setAdListener(new AdListener() {
+    this.adView.setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
                 int width = adView.getAdSize().getWidthInPixels(context);
@@ -109,6 +112,7 @@ class ReactPublisherAdView extends ReactViewGroup implements AppEventListener {
     private void sendOnSizeChangeEvent() {
         int width;
         int height;
+
         ReactContext reactContext = (ReactContext) getContext();
         WritableMap event = Arguments.createMap();
         AdSize adSize = this.adView.getAdSize();
@@ -127,9 +131,9 @@ class ReactPublisherAdView extends ReactViewGroup implements AppEventListener {
     private void sendEvent(String name, @Nullable WritableMap event) {
         ReactContext reactContext = (ReactContext) getContext();
         reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
-                        getId(),
-                        name,
-                        event);
+                getId(),
+                name,
+                event);
     }
 
     public void loadBanner() {
@@ -150,7 +154,7 @@ class ReactPublisherAdView extends ReactViewGroup implements AppEventListener {
         AdSize[] adSizesArray = adSizes.toArray(new AdSize[adSizes.size()]);
         this.adView.setAdSizes(adSizesArray);
 
-        PublisherAdRequest.Builder adRequestBuilder = new PublisherAdRequest.Builder();
+        final PublisherAdRequest.Builder adRequestBuilder = new PublisherAdRequest.Builder();
         if (testDevices != null) {
             for (int i = 0; i < testDevices.length; i++) {
                 adRequestBuilder.addTestDevice(testDevices[i]);
@@ -159,12 +163,15 @@ class ReactPublisherAdView extends ReactViewGroup implements AppEventListener {
         if (this.customTargeting != null) {
             Iterator entries = this.customTargeting.entrySet().iterator();
             while (entries.hasNext()) {
-                Map.Entry<String, String> entry = entries.next();
-                adRequestBuilder.addCustomTargeting(entry.getKey(), entry.getValue());
+                Map.Entry entry = (Map.Entry) entries.next();
+                adRequestBuilder.addCustomTargeting((String) entry.getKey(), (String) entry.getValue());
             }
         }
         PublisherAdRequest adRequest = adRequestBuilder.build();
         this.adView.loadAd(adRequest);
+
+
+
     }
 
     public void setAdUnitID(String adUnitID) {
@@ -189,7 +196,7 @@ class ReactPublisherAdView extends ReactViewGroup implements AppEventListener {
         this.validAdSizes = adSizes;
     }
 
-    public void setCustomTargeting(HashMap<String, String> customTargeting) {
+    public void setCustomTargeting(HashMap<String, Object> customTargeting) {
         this.customTargeting = customTargeting;
     }
 
@@ -244,13 +251,13 @@ public class RNPublisherBannerViewManager extends ViewGroupManager<ReactPublishe
     public Map<String, Object> getExportedCustomDirectEventTypeConstants() {
         MapBuilder.Builder<String, Object> builder = MapBuilder.builder();
         String[] events = {
-            EVENT_SIZE_CHANGE,
-            EVENT_AD_LOADED,
-            EVENT_AD_FAILED_TO_LOAD,
-            EVENT_AD_OPENED,
-            EVENT_AD_CLOSED,
-            EVENT_AD_LEFT_APPLICATION,
-            EVENT_APP_EVENT
+                EVENT_SIZE_CHANGE,
+                EVENT_AD_LOADED,
+                EVENT_AD_FAILED_TO_LOAD,
+                EVENT_AD_OPENED,
+                EVENT_AD_CLOSED,
+                EVENT_AD_LEFT_APPLICATION,
+                EVENT_APP_EVENT
         };
         for (int i = 0; i < events.length; i++) {
             builder.put(events[i], MapBuilder.of("registrationName", events[i]));
@@ -266,14 +273,14 @@ public class RNPublisherBannerViewManager extends ViewGroupManager<ReactPublishe
 
     @ReactProp(name = PROP_VALID_AD_SIZES)
     public void setPropValidAdSizes(final ReactPublisherAdView view, final ReadableArray adSizeStrings) {
-        ReadableNativeArray nativeArray = (ReadableNativeArray)adSizeStrings;
+        ReadableNativeArray nativeArray = (ReadableNativeArray) adSizeStrings;
         ArrayList<Object> list = nativeArray.toArrayList();
         String[] adSizeStringsArray = list.toArray(new String[list.size()]);
         AdSize[] adSizes = new AdSize[list.size()];
 
         for (int i = 0; i < adSizeStringsArray.length; i++) {
-                String adSizeString = adSizeStringsArray[i];
-                adSizes[i] = getAdSizeFromString(adSizeString);
+            String adSizeString = adSizeStringsArray[i];
+            adSizes[i] = getAdSizeFromString(adSizeString);
         }
         view.setValidAdSizes(adSizes);
     }
@@ -285,16 +292,16 @@ public class RNPublisherBannerViewManager extends ViewGroupManager<ReactPublishe
 
     @ReactProp(name = PROP_TEST_DEVICES)
     public void setPropTestDevices(final ReactPublisherAdView view, final ReadableArray testDevices) {
-        ReadableNativeArray nativeArray = (ReadableNativeArray)testDevices;
+        ReadableNativeArray nativeArray = (ReadableNativeArray) testDevices;
         ArrayList<Object> list = nativeArray.toArrayList();
         view.setTestDevices(list.toArray(new String[list.size()]));
     }
 
     @ReactProp(name = PROP_CUSTOM_TARGETING)
     public void setPropCustomTargeting(final ReactPublisherAdView view, final ReadableMap customTargeting) {
-        ReadableNativeMap nativeMap = (ReadableNativeMap)customTargeting;
-        HashMap<String, String> hmap = new HashMap<String, String>();
-        hmap = (HashMap<String, String>)nativeMap.toHashMap();
+        ReadableNativeMap nativeMap = (ReadableNativeMap) customTargeting;
+        HashMap<String, Object> hmap = new HashMap<String, Object>();
+        hmap = (HashMap<String, Object>) nativeMap.toHashMap();
         view.setCustomTargeting(hmap);
     }
 
@@ -345,3 +352,5 @@ public class RNPublisherBannerViewManager extends ViewGroupManager<ReactPublishe
         }
     }
 }
+
+

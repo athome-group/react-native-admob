@@ -225,7 +225,7 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
                     if (didAllRequestsFinish(requestKey)) {
                         Promise requestKeyPromise = mRequestAdsPromises.get(requestKey);
                         if (requestKeyPromise != null) {
-                            requestKeyPromise.resolve(getAdAssetsMap(ad));
+                            requestKeyPromise.resolve(getWritableMapFromNativeAdsMap(requestKey));
                         }
                         sendOnAllAdsLoadedEvent(requestKey, getWritableMapFromNativeAdsMap(requestKey));
                         cleanUp(requestKey);

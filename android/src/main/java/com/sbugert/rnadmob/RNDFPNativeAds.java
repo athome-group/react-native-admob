@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -23,9 +24,9 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.formats.NativeAdOptions;
 import com.google.android.gms.ads.formats.NativeCustomTemplateAd;
-import com.google.android.gms.common.api.BooleanResult;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 
@@ -48,6 +49,7 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
         "returned due to lack of ad inventory.";
 
 
+    private static final String AD_KEY = "ad";
     private static final String ADS_KEY = "ads";
     private static final String ERROR_KEY = "error";
     private String KADUNITID = "adUnitID";
@@ -72,10 +74,10 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
     private ReadableArray mTestDevices = Arguments.createArray();
     private ReadableArray mTemplateIDs = Arguments.createArray();
     private ReadableMap mCustomTargetings = Arguments.createMap();
-    private HashMap<String, HashMap<String, NativeCustomTemplateAd>> mNativeCustomTemplateAds = new HashMap<>();
-    private HashMap<String, WritableMap> mConvertedAds = new HashMap<>();
-    private HashMap<String, Callback> mRequestAdsResolves = new HashMap<>();
-    private HashMap<String, Callback> mRequestAdsRejects = new HashMap<>();
+    private HashMap<String, HashMap<String, Boolean>> mProcessingNativeCustomTemplateAds = new HashMap<>();
+    private HashMap<String, HashMap<String, Boolean>> mFailedNativeCustomTemplateAds = new HashMap<>();
+    private HashMap<String, HashMap<String, NativeCustomTemplateAd>> mConvertedNativeCustomTemplateAds = new HashMap<>();
+    private HashMap<String, Promise> mRequestAdsPromises = new HashMap<>();
     private HashMap<String, HashMap<String, Boolean>> mAdLoaders = new HashMap<>();
     private HashMap<String, ReadableArray> mAdUnits = new HashMap<>();
 
@@ -112,7 +114,7 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
     public void performClickOnAsset(String asset, String requestKey, String unitId) {
         try {
             int adUnitKey = Integer.parseInt(unitId);
-            mNativeCustomTemplateAds.get(requestKey).get(adUnitKey).performClick(asset);
+            mConvertedNativeCustomTemplateAds.get(requestKey).get(adUnitKey).performClick(asset);
         } catch (Exception e) {
 //          Could not perform click fot the add asset
         }
@@ -124,24 +126,23 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
         HashMap<String, Boolean> loaders = mAdLoaders.get(requestKey);
         if (loaders != null) {
             boolean isLoading = loaders.get(adUnitId);
-                loading = isLoading;
+            loading = isLoading;
         }
         response.invoke(loading);
     }
 
     @ReactMethod
-    public void requestAds(final String requestKey, ReadableArray dfpAdUnitIds, Callback resolve,
-                           Callback reject) {
+    public void requestAds(final String requestKey, ReadableArray dfpAdUnitIds, Promise requestKeyPromise) {
 
         if (TextUtils.isEmpty(requestKey) || ((dfpAdUnitIds == null || dfpAdUnitIds.size() == 0))) {
-            reject.invoke(EVENT_ADS_INVALID_PARAMETERS,
+            requestKeyPromise.reject(EVENT_ADS_INVALID_PARAMETERS,
                 MSG_ADS_INVALID_PARAMETERS,
                 null);
             Log.v(REACT_CLASS, "MSG_ADS_INVALID_PARAMETERS");
             return;
         }
         if (mTemplateIDs.size() <= 0) {
-            reject.invoke(EVENT_ADS_NO_TEMPLATE_ID,
+            requestKeyPromise.reject(EVENT_ADS_NO_TEMPLATE_ID,
                 MSG_ADS_NO_TEMPLATE_ID,
                 null);
             Log.v(REACT_CLASS, "MSG_ADS_NO_TEMPLATE_ID");
@@ -149,13 +150,12 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
         }
 
         if (!hasRequestLoading(requestKey)) {
-
-            mNativeCustomTemplateAds.put(requestKey, new HashMap<String, NativeCustomTemplateAd>());
-            mConvertedAds.put(requestKey, Arguments.createMap());
+            mProcessingNativeCustomTemplateAds.put(requestKey, new HashMap<String, Boolean>());
+            mFailedNativeCustomTemplateAds.put(requestKey, new HashMap<String, Boolean>());
+            mConvertedNativeCustomTemplateAds.put(requestKey, new HashMap<String, NativeCustomTemplateAd>());
             mAdLoaders.put(requestKey, new HashMap<String, Boolean>());
             mAdUnits.put(requestKey, dfpAdUnitIds);
-            mRequestAdsResolves.put(requestKey, resolve);
-            mRequestAdsRejects.put(requestKey, reject);
+            mRequestAdsPromises.put(requestKey, requestKeyPromise);
 
             Log.v(REACT_CLASS, "!hasRequestLoading: " + requestKey);
 
@@ -165,7 +165,7 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
                 for (int j = 0; j < mTemplateIDs.size(); j++) {
                     String templateID = mTemplateIDs.getString(j);
                     Log.v(REACT_CLASS, "!templateID: " + templateID);
-
+                    mProcessingNativeCustomTemplateAds.get(requestKey).put(unitId, true);
                     final AdLoader adLoader = getAdLoader(unitId, templateID, requestKey);
                     mAdLoaders.get(requestKey).put(unitId, false);
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -190,7 +190,7 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
 
                             adLoader.loadAd(publisherAdRequestBuilder.build());
                             mAdLoaders.get(requestKey).put(unitId, true);
-                            Log.v(REACT_CLASS, "hasRequestLoading (should be true): "+ hasRequestLoading(requestKey));
+                            Log.v(REACT_CLASS, "hasRequestLoading (should be true): " + hasRequestLoading(requestKey));
 
                             sendOnAdsStartingLoading(requestKey, unitId);
                         }
@@ -198,7 +198,7 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
                 }
             }
         } else {
-            reject.invoke(EVENT_ADS_ALREADY_LOADING,
+            requestKeyPromise.reject(EVENT_ADS_ALREADY_LOADING,
                 String.format(Locale.getDefault(),
                     MSG_ADS_ALREADY_LOADING,
                     requestKey), null);
@@ -217,19 +217,19 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
 
                     Log.v(REACT_CLASS, "ad loaded for " + requestKey + " with unitId: " + dfpAdUnitId);
 
-                    mNativeCustomTemplateAds.get(requestKey).put(dfpAdUnitId, ad);
-                    mConvertedAds.put(requestKey, getAdAssetsMap(ad));
                     sendOnAdLoadedEvent(requestKey, dfpAdUnitId, getAdAssetsMap(ad));
                     ad.recordImpression();
+                    mConvertedNativeCustomTemplateAds.get(requestKey).put(dfpAdUnitId, ad);
+                    mProcessingNativeCustomTemplateAds.get(requestKey).put(dfpAdUnitId, false);
+                    mAdLoaders.get(requestKey).put(dfpAdUnitId, false);
                     if (didAllRequestsFinish(requestKey)) {
-                        Callback resolves = mRequestAdsResolves.get(requestKey);
-                        if (resolves != null) {
-                            mRequestAdsResolves.get(requestKey).invoke(getAdAssetsMap(ad));
+                        Promise requestKeyPromise = mRequestAdsPromises.get(requestKey);
+                        if (requestKeyPromise != null) {
+                            requestKeyPromise.resolve(getAdAssetsMap(ad));
                         }
                         sendOnAllAdsLoadedEvent(requestKey, getAdAssetsMap(ad));
                         cleanUp(requestKey);
                     }
-                    mAdLoaders.get(requestKey).put(dfpAdUnitId, false);
                 }
 
             }, new NativeCustomTemplateAd.OnCustomClickListener() {
@@ -241,14 +241,17 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
                 @Override
                 public void onAdFailedToLoad(int errorCode) {
                     sendOnAdFailedEvent(requestKey, dfpAdUnitId, errorCode);
+                    mProcessingNativeCustomTemplateAds.get(requestKey).put(dfpAdUnitId, false);
+                    mFailedNativeCustomTemplateAds.get(requestKey).put(dfpAdUnitId, true);
+                    mAdLoaders.get(requestKey).put(dfpAdUnitId, false);
                     if (didAllAdRequestsFailed(requestKey)) {
                         sendOnAllAdsFailedEvent(requestKey, errorCode);
-                        mRequestAdsRejects
-                            .get(requestKey)
-                            .invoke(EVENT_ADS_REQUEST_FAILED, getAdLoaderStringError(errorCode));
+                        Promise requestKeyPromise = mRequestAdsPromises.get(requestKey);
+                        if (requestKeyPromise != null) {
+                            requestKeyPromise.reject(EVENT_ADS_REQUEST_FAILED, getAdLoaderStringError(errorCode));
+                        }
                         cleanUp(requestKey);
                     }
-                    mAdLoaders.get(requestKey).put(dfpAdUnitId, false);
                 }
 
                 @Override
@@ -280,31 +283,44 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
     private boolean didAllRequestsFinish(String requestKey) {
         ReadableArray adUnits = mAdUnits.get(requestKey);
         if (adUnits != null) {
-            return mNativeCustomTemplateAds.get(requestKey).keySet().size() == adUnits.size();
-        } else {
-            return true;
+            if (adUnits != null) {
+                HashMap<String, Boolean> processingAds = mProcessingNativeCustomTemplateAds.get(requestKey);
+                if (processingAds != null) {
+                    Iterator it = processingAds.entrySet().iterator();
+                    while (it.hasNext()) {
+                        Map.Entry entry = (Map.Entry) it.next();
+                        if ((boolean) entry.getValue()) {
+                            return false;
+                        }
+                    }
+                }
+            }
+
         }
+        return true;
     }
 
     private boolean didAllAdRequestsFailed(String requestKey) {
         ReadableArray adUnits = mAdUnits.get(requestKey);
         if (adUnits != null) {
-            return mNativeCustomTemplateAds.get(requestKey).values().size() == adUnits.size();
-        } else {
-            return true;
+            HashMap<String, Boolean> failedAds = mFailedNativeCustomTemplateAds.get(requestKey);
+            if (failedAds != null) {
+                return failedAds.size() == adUnits.size();
+            }
         }
+        return true;
     }
 
     private void cleanUp(String requestKey) {
-        mConvertedAds.remove(requestKey);
+        mProcessingNativeCustomTemplateAds.remove(requestKey);
+        mFailedNativeCustomTemplateAds.remove(requestKey);
         mAdLoaders.remove(requestKey);
         mAdUnits.remove(requestKey);
-        mRequestAdsResolves.remove(requestKey);
-        mRequestAdsRejects.remove(requestKey);
+        mRequestAdsPromises.remove(requestKey);
     }
 
     private void sendEvent(String eventName, @Nullable WritableMap params) {
-        Log.v(REACT_CLASS, "##Sending Event: " + eventName + " with requestKey: "+params.getString(KREQUESTKEY));
+        Log.v(REACT_CLASS, "##Sending Event: " + eventName + " with requestKey: " + params.getString(KREQUESTKEY));
         getReactApplicationContext()
             .getJSModule(DeviceEventManagerModule
                 .RCTDeviceEventEmitter.class)
@@ -319,7 +335,7 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
         WritableMap params = Arguments.createMap();
         params.putString(KREQUESTKEY, requestKey);
         params.putString(KADUNITID, adUnitId);
-        params.putMap(ADS_KEY, ad);
+        params.putMap(AD_KEY, ad);
         sendEvent(KEVENTADLOADED, params);
     }
 
@@ -331,8 +347,8 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
     private void sendOnAllAdsLoadedEvent(String requestKey, WritableMap ads) {
         WritableMap params = Arguments.createMap();
         params.putString(KREQUESTKEY, requestKey);
-        params.putMap(ADS_KEY, ads);
-        sendEvent(KEVENTADLOADED, params);
+        params.putMap(ADS_KEY, getWritableMapFromNativeAdsMap(requestKey));
+        sendEvent(KEVENTALLADSFINISHED, params);
     }
 
     private void sendOnAllAdsFailedEvent(String requestKey, int errorCode) {
@@ -343,24 +359,40 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
 
     }
 
+    private WritableMap getWritableMapFromNativeAdsMap(String requestKey) {
+        WritableMap nativeAds = Arguments.createMap();
+        HashMap<String, NativeCustomTemplateAd> convertedAds =
+            mConvertedNativeCustomTemplateAds.get(requestKey);
+        if (convertedAds != null) {
+            Iterator it = convertedAds.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry entry = (Map.Entry) it.next();
+                nativeAds
+                    .putMap((String) entry.getKey(),
+                        getAdAssetsMap((NativeCustomTemplateAd) entry.getValue()));
+            }
+        }
+        return nativeAds;
+    }
+
     @NonNull
     private WritableMap getAdAssetsMap(NativeCustomTemplateAd ad) {
         WritableMap adAssets = Arguments.createMap();
         for (String name : ad.getAvailableAssetNames()) {
-            Log.v(REACT_CLASS, "Asset name: " + name);
+            //  Log.v(REACT_CLASS, "Asset name: " + name);
             CharSequence text = ad.getText(name);
             if (!TextUtils.isEmpty(text)) {
                 adAssets.putString(name, text.toString());
-                Log.v(REACT_CLASS, "Asset type text: " + text);
+                //      Log.v(REACT_CLASS, "Asset type text: " + text);
             } else if (ad.getImage(name) != null) {
                 String imageUrl = ad.getImage(name).getUri().toString();
                 if (!TextUtils.isEmpty(imageUrl)) {
                     adAssets.putString(name, imageUrl);
-                    Log.v(REACT_CLASS, "Asset type image: " + imageUrl);
+                    //         Log.v(REACT_CLASS, "Asset type image: " + imageUrl);
                 }
             }
         }
-        Log.v(REACT_CLASS, "adAssets image: " + adAssets.getString("MainImage"));
+        // Log.v(REACT_CLASS, "adAssets image: " + adAssets.getString("MainImage"));
         return adAssets;
     }
 

@@ -249,7 +249,10 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
                     if (hashFailedAds != null) {
                         hashFailedAds.put(dfpAdUnitId, true);
                     }
-                    mAdLoaders.get(requestKey).put(dfpAdUnitId, false);
+                    HashMap<String, Boolean> hashLoaders = mAdLoaders.get(requestKey);
+                    if (hashLoaders != null) {
+                        hashLoaders.put(dfpAdUnitId, false);
+                    }
                     if (didAllAdRequestsFailed(requestKey)) {
                         sendOnAllAdsFailedEvent(requestKey, errorCode);
                         Promise requestKeyPromise = mRequestAdsPromises.get(requestKey);

@@ -194,15 +194,18 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
                                 ReadableMapKeySetIterator it = mCustomTargetings.keySetIterator();
                                 while (it.hasNextKey()) {
                                     String key = it.nextKey();
-                                    if (mCustomTargetings.getType(key) == ReadableType.Array){
+                                    if (mCustomTargetings.getType(key) == ReadableType.Array) {
                                         try {
-                                            publisherAdRequestBuilder.addCustomTargeting(key,  mCustomTargetings.getArray(key).toArrayList().toList());
+                                            ArrayList<Object> al = mCustomTargetings.getArray(key).toArrayList();
+                                            List<String> valList = new ArrayList<>();
+                                            for (int l = 0; l < al.size(); l++) {
+                                                valList.add(l, (String )al.get(l));
+                                            }
+                                            publisherAdRequestBuilder.addCustomTargeting(key, valList);
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                         }
-                                    }
-                                    else if (mCustomTargetings.getType(key) == ReadableType.String)
-                                    {
+                                    } else if (mCustomTargetings.getType(key) == ReadableType.String) {
                                         publisherAdRequestBuilder.addCustomTargeting(key, mCustomTargetings.getString(key));
                                     }
                                 }

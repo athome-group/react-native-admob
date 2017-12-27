@@ -16,6 +16,7 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
+import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.google.android.gms.ads.AdListener;
@@ -25,8 +26,10 @@ import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.formats.NativeAdOptions;
 import com.google.android.gms.ads.formats.NativeCustomTemplateAd;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -118,7 +121,6 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
                     Log.v(REACT_CLASS, "Gonna kick As Asset ( ad: " + adToClick.getText(asset) + ")");
                     // adToClick.performClick(asset);
                     //  performClickOnUIThread(adToClick, unitId);
-
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override
                         public void run() {
@@ -192,7 +194,17 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
                                 ReadableMapKeySetIterator it = mCustomTargetings.keySetIterator();
                                 while (it.hasNextKey()) {
                                     String key = it.nextKey();
-                                    publisherAdRequestBuilder.addCustomTargeting(key, mCustomTargetings.getString(key));
+                                    if (mCustomTargetings.getType(key) == ReadableType.Array){
+                                        try {
+                                            publisherAdRequestBuilder.addCustomTargeting(key,  mCustomTargetings.getArray(key).toArrayList().toList());
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                    else if (mCustomTargetings.getType(key) == ReadableType.String)
+                                    {
+                                        publisherAdRequestBuilder.addCustomTargeting(key, mCustomTargetings.getString(key));
+                                    }
                                 }
                             }
                             adLoader.loadAd(publisherAdRequestBuilder.build());

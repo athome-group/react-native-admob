@@ -199,7 +199,7 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
                                             ArrayList<Object> al = mCustomTargetings.getArray(key).toArrayList();
                                             List<String> valList = new ArrayList<>();
                                             for (int l = 0; l < al.size(); l++) {
-                                                valList.add(l, (String )al.get(l));
+                                                valList.add(l, (String) al.get(l));
                                             }
                                             publisherAdRequestBuilder.addCustomTargeting(key, valList);
                                         } catch (Exception e) {
@@ -247,12 +247,7 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
                     }
                 }
 
-            }, new NativeCustomTemplateAd.OnCustomClickListener() {
-                @Override
-                public void onCustomClick(NativeCustomTemplateAd ad, String s) {
-
-                }
-            }).withAdListener(new AdListener() {
+            }, null).withAdListener(new AdListener() {
                 @Override
                 public void onAdFailedToLoad(int errorCode) {
                     sendOnAdFailedEvent(requestKey, dfpAdUnitId, errorCode);

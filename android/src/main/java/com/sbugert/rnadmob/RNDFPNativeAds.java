@@ -25,6 +25,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.formats.NativeAdOptions;
 import com.google.android.gms.ads.formats.NativeCustomTemplateAd;
+import com.google.android.gms.common.api.BooleanResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -234,9 +235,21 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
                 public void onCustomTemplateAdLoaded(NativeCustomTemplateAd ad) {
                     sendOnAdLoadedEvent(requestKey, dfpAdUnitId, getAdAssetsMap(ad));
                     ad.recordImpression();
-                    mConvertedNativeCustomTemplateAds.get(requestKey).put(dfpAdUnitId, ad);
-                    mProcessingNativeCustomTemplateAds.get(requestKey).put(dfpAdUnitId, false);
-                    mAdLoaders.get(requestKey).put(dfpAdUnitId, false);
+                    HashMap<String, NativeCustomTemplateAd> convertedMap = mConvertedNativeCustomTemplateAds.get(requestKey);
+                    if (convertedMap != null)
+                    {
+                        convertedMap.put(dfpAdUnitId, ad);
+                    }
+                    HashMap<String, Boolean> processingMap = mProcessingNativeCustomTemplateAds.get(requestKey);
+                    if (processingMap != null)
+                    {
+                        processingMap.put(dfpAdUnitId, false);
+                    }
+                    HashMap<String, Boolean> loadersMap =mAdLoaders.get(requestKey);
+                    if (loadersMap != null)
+                    {
+                        loadersMap.put(dfpAdUnitId, false);
+                    }
                     if (didAllRequestsFinish(requestKey)) {
                         Promise requestKeyPromise = mRequestAdsPromises.get(requestKey);
                         if (requestKeyPromise != null) {

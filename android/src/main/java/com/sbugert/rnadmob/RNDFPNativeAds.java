@@ -25,7 +25,6 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.formats.NativeAdOptions;
 import com.google.android.gms.ads.formats.NativeCustomTemplateAd;
-import com.google.android.gms.common.api.BooleanResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -94,7 +93,6 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
         return REACT_CLASS;
     }
 
-
     @ReactMethod
     public void setTemplateIDs(ReadableArray templateIDs) {
         mTemplateIDs = templateIDs;
@@ -103,13 +101,11 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
     @ReactMethod
     public void setCustomTargeting(ReadableMap customTargeting) {
         mCustomTargetings = customTargeting;
-
     }
 
     @ReactMethod
     public void setTestDevices(ReadableArray testDevices) {
         mTestDevices = testDevices;
-
     }
 
     @ReactMethod
@@ -212,7 +208,11 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
                                 }
                             }
                             adLoader.loadAd(publisherAdRequestBuilder.build());
-                            mAdLoaders.get(requestKey).put(unitId, true);
+
+                            HashMap<String, Boolean> adLoaderMap = mAdLoaders.get(requestKey);
+                            if (adLoaderMap != null) {
+                                adLoaderMap.put(unitId, true);
+                            }
                             sendOnAdsStartingLoading(requestKey, unitId);
                         }
                     });
@@ -236,18 +236,15 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
                     sendOnAdLoadedEvent(requestKey, dfpAdUnitId, getAdAssetsMap(ad));
                     ad.recordImpression();
                     HashMap<String, NativeCustomTemplateAd> convertedMap = mConvertedNativeCustomTemplateAds.get(requestKey);
-                    if (convertedMap != null)
-                    {
+                    if (convertedMap != null) {
                         convertedMap.put(dfpAdUnitId, ad);
                     }
                     HashMap<String, Boolean> processingMap = mProcessingNativeCustomTemplateAds.get(requestKey);
-                    if (processingMap != null)
-                    {
+                    if (processingMap != null) {
                         processingMap.put(dfpAdUnitId, false);
                     }
-                    HashMap<String, Boolean> loadersMap =mAdLoaders.get(requestKey);
-                    if (loadersMap != null)
-                    {
+                    HashMap<String, Boolean> loadersMap = mAdLoaders.get(requestKey);
+                    if (loadersMap != null) {
                         loadersMap.put(dfpAdUnitId, false);
                     }
                     if (didAllRequestsFinish(requestKey)) {

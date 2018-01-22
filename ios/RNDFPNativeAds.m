@@ -103,17 +103,7 @@ RCT_EXPORT_METHOD(setCustomTargeting:(NSDictionary *)customTargeting)
 
 RCT_EXPORT_METHOD(performClickOnAsset:(NSString *)assetKey requestKey:(NSString *)key unitID:(NSString *)unitID)
 {
-    if (_nativeCustomTemplateAds[key]) {
-        GADNativeCustomTemplateAd *ad = _nativeCustomTemplateAds[key][unitID];
-        if (ad) {
-            [ad performClickOnAssetWithKey:assetKey];
-        }
-    }
-}
-
-RCT_EXPORT_METHOD(cleanUp:(NSArray<NSString *> *)requestKeys)
-{
-    [_nativeCustomTemplateAds removeObjectsForKeys:requestKeys];
+    [_nativeCustomTemplateAds[key][unitID] performClickOnAssetWithKey:assetKey];
 }
 
 RCT_EXPORT_METHOD(isNativeAdLoading:(NSString *)key unitID:(NSString *)unitID callback:(RCTResponseSenderBlock)callback)
@@ -131,6 +121,7 @@ RCT_EXPORT_METHOD(requestAds:(NSString *)requestKey forAdUnitIDs:(NSArray *)adUn
     }
     
     if (![self requestLoading:requestKey]) {
+        [_nativeCustomTemplateAds setObject:@{}.mutableCopy forKey:requestKey];
         [_convertedAds setObject:@{}.mutableCopy forKey:requestKey];
         [_adLoaders setObject:@{}.mutableCopy forKey:requestKey];
         [_adUnitIDs setObject:adUnitIDs forKey:requestKey];
@@ -192,12 +183,7 @@ RCT_EXPORT_METHOD(requestAds:(NSString *)requestKey forAdUnitIDs:(NSArray *)adUn
 didReceiveNativeCustomTemplateAd:(GADNativeCustomTemplateAd *)nativeCustomTemplateAd {
     NSString *requestKey = adLoader.requestKey;
     
-    if (nativeCustomTemplateAd) {
-        if (!_nativeCustomTemplateAds[requestKey]) {
-            [_nativeCustomTemplateAds setObject:@{}.mutableCopy forKey:requestKey];
-        }
-        [_nativeCustomTemplateAds[requestKey] setObject:nativeCustomTemplateAd forKey:adLoader.adUnitID];
-    }
+    [_nativeCustomTemplateAds[requestKey] setObject:nativeCustomTemplateAd?:[NSNull null] forKey:adLoader.adUnitID];
     
     NSMutableDictionary *ad = @{}.mutableCopy;
     
@@ -223,7 +209,7 @@ didReceiveNativeCustomTemplateAd:(GADNativeCustomTemplateAd *)nativeCustomTempla
         }
         
         _requestAdsResolves[requestKey](_convertedAds[requestKey]);
-        [self internalCleanUp:requestKey];
+        [self cleanUp:requestKey];
     }
 }
 
@@ -241,7 +227,8 @@ didReceiveNativeCustomTemplateAd:(GADNativeCustomTemplateAd *)nativeCustomTempla
     if (hasListeners) {
         [self sendEventWithName:kEventAdFailedToLoad body:@{kRequestKey:requestKey, kAdUnitID: adLoader.adUnitID, @"error":jsError}];
     }
-    // TODO: can set in dictionary the error object
+    // TODO: can set in both dictionaries the error object
+    [_nativeCustomTemplateAds[requestKey] setObject:[NSNull null] forKey:adLoader.adUnitID];
     [_convertedAds[requestKey] setObject:@{} forKey:adLoader.adUnitID];
     
     if ([self allAdsFailed:requestKey]) {
@@ -250,13 +237,13 @@ didReceiveNativeCustomTemplateAd:(GADNativeCustomTemplateAd *)nativeCustomTempla
         }
         
         _requestAdsRejects[requestKey](@"E_ADS_REQUEST_FAILED", error.localizedDescription, error);
-        [self internalCleanUp:requestKey];
+        [self cleanUp:requestKey];
     }
 }
 
 #pragma mark Helper
 
-- (void)internalCleanUp:(NSString *)requestKey {
+- (void)cleanUp:(NSString *)requestKey {
     // __nativeCustomTemplateAds not cleaned since further actions may be performed e.g. performClickOnAssetWithKey
     [_convertedAds removeObjectForKey:requestKey];
     [_adLoaders removeObjectForKey:requestKey];
@@ -275,16 +262,16 @@ didReceiveNativeCustomTemplateAd:(GADNativeCustomTemplateAd *)nativeCustomTempla
 }
 
 - (BOOL)allAdsFinished:(NSString *)requestKey {
-    return _convertedAds[requestKey].allKeys.count == _adUnitIDs[requestKey].count;
+    return _nativeCustomTemplateAds[requestKey].allKeys.count == _adUnitIDs[requestKey].count;
 }
 
 - (BOOL)allAdsFailed:(NSString *)requestKey {
-    if (_convertedAds[requestKey].allValues.count != _adUnitIDs[requestKey].count) {
+    if (_nativeCustomTemplateAds[requestKey].allValues.count != _adUnitIDs[requestKey].count) {
         return false;
     }
     
-    for (NSDictionary *ad in _convertedAds[requestKey].allValues) {
-        if (ad.count != 0) {
+    for (GADNativeCustomTemplateAd *ad in _nativeCustomTemplateAds[requestKey].allValues) {
+        if (![ad isEqual:[NSNull null]]) {
             return false;
         }
     }

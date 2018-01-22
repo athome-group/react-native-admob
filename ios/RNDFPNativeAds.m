@@ -41,9 +41,9 @@ static NSString *const kRequestKey = @"requestKey";
     NSMutableDictionary<NSString *, NSMutableDictionary *> *_convertedAds;
     NSMutableDictionary<NSString *, NSMutableDictionary<NSString *, GADAdLoader *> *> *_adLoaders;
     NSMutableDictionary<NSString *, NSArray<NSString *> *> *_adUnitIDs;
-    NSArray *_templateIDs;
+    NSMutableDictionary<NSString *, NSArray *> *_templateIDs;
     NSArray *_testDevices;
-    NSDictionary *_customTargeting;
+    NSMutableDictionary<NSString *, NSDictionary *> *_customTargetings;
     NSMutableDictionary<NSString *, RCTPromiseResolveBlock> *_requestAdsResolves;
     NSMutableDictionary<NSString *, RCTPromiseRejectBlock> *_requestAdsRejects;
     BOOL hasListeners;
@@ -58,6 +58,8 @@ static NSString *const kRequestKey = @"requestKey";
         _adUnitIDs = @{}.mutableCopy;
         _requestAdsResolves = @{}.mutableCopy;
         _requestAdsRejects = @{}.mutableCopy;
+        _templateIDs = @{}.mutableCopy;
+        _customTargetings = @{}.mutableCopy;
     }
     return self;
 }
@@ -91,14 +93,14 @@ RCT_EXPORT_METHOD(setTestDevices:(NSArray *)testDevices)
     _testDevices = testDevices;
 }
 
-RCT_EXPORT_METHOD(setTemplateIDs:(NSArray *)templateIDs)
+RCT_EXPORT_METHOD(setTemplateIDs:(NSArray *)templateIDs forRequestKey:(NSString *)requestKey)
 {
-    _templateIDs = templateIDs;
+    _templateIDs[requestKey] = templateIDs;
 }
 
-RCT_EXPORT_METHOD(setCustomTargeting:(NSDictionary *)customTargeting)
+RCT_EXPORT_METHOD(setCustomTargeting:(NSDictionary *)customTargeting forRequestKey:(NSString *)requestKey)
 {
-    _customTargeting = customTargeting;
+    _customTargetings[requestKey] = customTargeting;
 }
 
 RCT_EXPORT_METHOD(performClickOnAsset:(NSString *)assetKey requestKey:(NSString *)key unitID:(NSString *)unitID)
@@ -156,7 +158,7 @@ RCT_EXPORT_METHOD(requestAds:(NSString *)requestKey forAdUnitIDs:(NSArray *)adUn
             
             DFPRequest *request = [DFPRequest request];
             request.testDevices = _testDevices;
-            request.customTargeting = _customTargeting;
+            request.customTargeting = _customTargetings[requestKey];
             [adLoader loadRequest:request];
             
             if (hasListeners) {
@@ -228,7 +230,7 @@ didReceiveNativeCustomTemplateAd:(GADNativeCustomTemplateAd *)nativeCustomTempla
 }
 
 - (NSArray *)nativeCustomTemplateIDsForAdLoader:(GADAdLoader *)adLoader {
-    return _templateIDs;
+    return _templateIDs[adLoader.requestKey];
 }
 
 
@@ -263,6 +265,8 @@ didReceiveNativeCustomTemplateAd:(GADNativeCustomTemplateAd *)nativeCustomTempla
     [_adUnitIDs removeObjectForKey:requestKey];
     [_requestAdsResolves removeObjectForKey:requestKey];
     [_requestAdsRejects removeObjectForKey:requestKey];
+    [_customTargetings removeObjectForKey:requestKey];
+    [_templateIDs removeObjectForKey:requestKey];
 }
 
 - (BOOL)requestLoading:(NSString *)requestKey {

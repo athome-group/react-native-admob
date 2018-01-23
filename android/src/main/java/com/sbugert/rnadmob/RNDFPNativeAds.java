@@ -75,8 +75,8 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
     public static final String EVENT_ADS_REQUEST_FAILED = "E_ADS_REQUEST_FAILED";
 
     private ReadableArray mTestDevices = Arguments.createArray();
-    private ReadableArray mTemplateIDs = Arguments.createArray();
-    private ReadableMap mCustomTargetings = Arguments.createMap();
+    private HashMap<String, ReadableArray> mTemplateIDs = new HashMap<>();
+    private HashMap<String, ReadableMap> mCustomTargetings = new HashMap<>();
     private HashMap<String, HashMap<String, Boolean>> mProcessingNativeCustomTemplateAds = new HashMap<>();
     private HashMap<String, HashMap<String, Boolean>> mFailedNativeCustomTemplateAds = new HashMap<>();
     private HashMap<String, HashMap<String, NativeCustomTemplateAd>> mConvertedNativeCustomTemplateAds = new HashMap<>();
@@ -94,13 +94,13 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void setTemplateIDs(ReadableArray templateIDs) {
-        mTemplateIDs = templateIDs;
+    public void setTemplateIDs(ReadableArray templateIDs, String requestKey) {
+        mTemplateIDs.put(requestKey, templateIDs);
     }
 
     @ReactMethod
-    public void setCustomTargeting(ReadableMap customTargeting) {
-        mCustomTargetings = customTargeting;
+    public void setCustomTargeting(ReadableMap customTargeting, String requestKey) {
+        mCustomTargetings.put(requestKey, customTargeting);
     }
 
     @ReactMethod
@@ -115,9 +115,6 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
             if (ads != null) {
                 final NativeCustomTemplateAd adToClick = ads.get(unitId);
                 if (adToClick != null) {
-                    Log.v(REACT_CLASS, "Gonna kick As Asset ( ad: " + adToClick.getText(asset) + ")");
-                    // adToClick.performClick(asset);
-                    //  performClickOnUIThread(adToClick, unitId);
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override
                         public void run() {
@@ -149,7 +146,6 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void requestAds(final String requestKey, ReadableArray dfpAdUnitIds, Promise requestKeyPromise) {
-
         if (TextUtils.isEmpty(requestKey) || ((dfpAdUnitIds == null || dfpAdUnitIds.size() == 0))) {
             requestKeyPromise.reject(EVENT_ADS_INVALID_PARAMETERS,
                 MSG_ADS_INVALID_PARAMETERS,
@@ -171,52 +167,60 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
             mRequestAdsPromises.put(requestKey, requestKeyPromise);
             for (int i = 0; i < dfpAdUnitIds.size(); i++) {
                 final String unitId = dfpAdUnitIds.getString(i);
-                for (int j = 0; j < mTemplateIDs.size(); j++) {
-                    String templateID = mTemplateIDs.getString(j);
-                    mProcessingNativeCustomTemplateAds.get(requestKey).put(unitId, true);
-                    final AdLoader adLoader = getAdLoader(unitId, templateID, requestKey);
-                    mAdLoaders.get(requestKey).put(unitId, false);
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            PublisherAdRequest.Builder publisherAdRequestBuilder =
-                                new PublisherAdRequest.Builder();
-                            if (mTestDevices != null) {
-                                for (int i = 0; i < mTestDevices.size(); i++) {
-                                    String testDevice = mTestDevices.getString(i);
-                                    publisherAdRequestBuilder.addTestDevice(testDevice);
-                                }
-                            }
-                            if (mCustomTargetings != null) {
-                                ReadableMapKeySetIterator it = mCustomTargetings.keySetIterator();
-                                while (it.hasNextKey()) {
-                                    String key = it.nextKey();
-                                    if (mCustomTargetings.getType(key) == ReadableType.Array) {
-                                        try {
-                                            ArrayList<Object> al = mCustomTargetings.getArray(key).toArrayList();
-                                            List<String> valList = new ArrayList<>();
-                                            for (int l = 0; l < al.size(); l++) {
-                                                valList.add(l, (String) al.get(l));
-                                            }
-                                            publisherAdRequestBuilder.addCustomTargeting(key, valList);
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-                                    } else if (mCustomTargetings.getType(key) == ReadableType.String) {
-                                        publisherAdRequestBuilder.addCustomTargeting(key, mCustomTargetings.getString(key));
-                                    }
-                                }
-                            }
-                            adLoader.loadAd(publisherAdRequestBuilder.build());
-
-                            HashMap<String, Boolean> adLoaderMap = mAdLoaders.get(requestKey);
-                            if (adLoaderMap != null) {
-                                adLoaderMap.put(unitId, true);
-                            }
-                            sendOnAdsStartingLoading(requestKey, unitId);
-                        }
-                    });
+                ReadableArray templateIds = mTemplateIDs.get(requestKey);
+                String templateId = "";
+                if (templateIds != null) {
+                    String tempId = templateIds.getString(0);
+                    if (tempId != null) {
+                        templateId = tempId;
+                    }
                 }
+                mProcessingNativeCustomTemplateAds.get(requestKey).put(unitId, true);
+                final AdLoader adLoader = getAdLoader(unitId, templateId, requestKey);
+                mAdLoaders.get(requestKey).put(unitId, false);
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        PublisherAdRequest.Builder publisherAdRequestBuilder =
+                            new PublisherAdRequest.Builder();
+                        if (mTestDevices != null) {
+                            for (int i = 0; i < mTestDevices.size(); i++) {
+                                String testDevice = mTestDevices.getString(i);
+                                publisherAdRequestBuilder.addTestDevice(testDevice);
+                            }
+                        }
+                        if (mCustomTargetings != null && mCustomTargetings.get(requestKey) != null) {
+                            ReadableMap customTargetings = mCustomTargetings.get(requestKey);
+                            ReadableMapKeySetIterator it = customTargetings.keySetIterator();
+                            while (it.hasNextKey()) {
+                                String key = it.nextKey();
+                                if (customTargetings.getType(key) == ReadableType.Array) {
+                                    try {
+                                        ArrayList<Object> al = customTargetings.getArray(key).toArrayList();
+                                        List<String> valList = new ArrayList<>();
+                                        for (int l = 0; l < al.size(); l++) {
+                                            valList.add(l, (String) al.get(l));
+                                        }
+                                        publisherAdRequestBuilder.addCustomTargeting(key, valList);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                } else if (customTargetings.getType(key) == ReadableType.String) {
+                                    publisherAdRequestBuilder.addCustomTargeting(key, customTargetings.getString(key));
+                                }
+                            }
+                        }
+                        adLoader.loadAd(publisherAdRequestBuilder.build());
+
+                        HashMap<String, Boolean> adLoaderMap = mAdLoaders.get(requestKey);
+                        if (adLoaderMap != null) {
+                            adLoaderMap.put(unitId, true);
+                        }
+                        sendOnAdsStartingLoading(requestKey, unitId);
+                    }
+                });
+                // }
+                //}
             }
         } else {
             requestKeyPromise.reject(EVENT_ADS_ALREADY_LOADING,
@@ -226,10 +230,18 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void cleanUp(ReadableArray requestKeys) {
+        for (int i = 0; i < requestKeys.size(); i++) {
+            String requestKey = requestKeys.getString(i);
+            mConvertedNativeCustomTemplateAds.remove(requestKey);
+        }
+    }
+
     private AdLoader getAdLoader(
-        final String dfpAdUnitId, String customTemplateAd, final String requestKey) {
+        final String dfpAdUnitId, final String customTemplateID, final String requestKey) {
         final AdLoader adLoader = new AdLoader.Builder(getReactApplicationContext(), dfpAdUnitId)
-            .forCustomTemplateAd(customTemplateAd, new NativeCustomTemplateAd
+            .forCustomTemplateAd(customTemplateID, new NativeCustomTemplateAd
                 .OnCustomTemplateAdLoadedListener() {
                 @Override
                 public void onCustomTemplateAdLoaded(NativeCustomTemplateAd ad) {

@@ -10,6 +10,8 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableNativeMap;
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMapKeySetIterator;
+import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.ReadableNativeArray;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.PixelUtil;
@@ -160,18 +162,37 @@ class ReactPublisherAdView extends ReactViewGroup implements AppEventListener {
                 adRequestBuilder.addTestDevice(testDevices[i]);
             }
         }
+        // if (this.customTargeting != null) {
+        //     // Iterator entries = this.customTargeting.entrySet().iterator();
+        //     ReadableMapKeySetIterator it = this.customTargeting.keySetIterator();
+        //     while (it.hasNextKey()) {
+        //         String key = it.nextKey();
+        //          if (this.customTargeting.getType(key) == ReadableType.Array) {
+        //             try {
+        //                 ArrayList<Object> al = this.customTargeting.getArray(key).toArrayList();
+        //                 List<String> valList = new ArrayList<>();
+        //                 for (int l = 0; l < al.size(); l++) {
+        //                     valList.add(l, (String) al.get(l));
+        //                 }
+        //                 adRequestBuilder.addCustomTargeting(key, valList);
+        //                 } catch (Exception e) {
+        //                     e.printStackTrace();
+        //                 }
+        //             } else if (this.customTargeting.getType(key) == ReadableType.String) {
+        //                 adRequestBuilder.addCustomTargeting(key, this.customTargeting.getString(key));
+        //             }
+        //     }
+        // }
+
         if (this.customTargeting != null) {
             Iterator entries = this.customTargeting.entrySet().iterator();
             while (entries.hasNext()) {
                 Map.Entry entry = (Map.Entry) entries.next();
-                adRequestBuilder.addCustomTargeting((String) entry.getKey(), (String) entry.getValue());
+                adRequestBuilder.addCustomTargeting((String) entry.getKey(), entry.getValue());
             }
         }
         PublisherAdRequest adRequest = adRequestBuilder.build();
         this.adView.loadAd(adRequest);
-
-
-
     }
 
     public void setAdUnitID(String adUnitID) {

@@ -29,6 +29,7 @@ import com.google.android.gms.ads.doubleclick.PublisherAdView;
 
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Iterator;
@@ -188,7 +189,11 @@ class ReactPublisherAdView extends ReactViewGroup implements AppEventListener {
             Iterator entries = this.customTargeting.entrySet().iterator();
             while (entries.hasNext()) {
                 Map.Entry entry = (Map.Entry) entries.next();
-                adRequestBuilder.addCustomTargeting((String) entry.getKey(), entry.getValue());
+                if (entry.getValue() instanceof ArrayList) {
+                    adRequestBuilder.addCustomTargeting((String) entry.getKey(), (List<String>)entry.getValue());
+                } else if (entry.getValue() instanceof String) {
+                    adRequestBuilder.addCustomTargeting((String) entry.getKey(), (String)entry.getValue());
+                }
             }
         }
         PublisherAdRequest adRequest = adRequestBuilder.build();

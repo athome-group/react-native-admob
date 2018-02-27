@@ -163,33 +163,11 @@ class ReactPublisherAdView extends ReactViewGroup implements AppEventListener {
                 adRequestBuilder.addTestDevice(testDevices[i]);
             }
         }
-        // if (this.customTargeting != null) {
-        //     // Iterator entries = this.customTargeting.entrySet().iterator();
-        //     ReadableMapKeySetIterator it = this.customTargeting.keySetIterator();
-        //     while (it.hasNextKey()) {
-        //         String key = it.nextKey();
-        //          if (this.customTargeting.getType(key) == ReadableType.Array) {
-        //             try {
-        //                 ArrayList<Object> al = this.customTargeting.getArray(key).toArrayList();
-        //                 List<String> valList = new ArrayList<>();
-        //                 for (int l = 0; l < al.size(); l++) {
-        //                     valList.add(l, (String) al.get(l));
-        //                 }
-        //                 adRequestBuilder.addCustomTargeting(key, valList);
-        //                 } catch (Exception e) {
-        //                     e.printStackTrace();
-        //                 }
-        //             } else if (this.customTargeting.getType(key) == ReadableType.String) {
-        //                 adRequestBuilder.addCustomTargeting(key, this.customTargeting.getString(key));
-        //             }
-        //     }
-        // }
-
         if (this.customTargeting != null) {
             Iterator entries = this.customTargeting.entrySet().iterator();
             while (entries.hasNext()) {
                 Map.Entry entry = (Map.Entry) entries.next();
-                if (entry.getValue() instanceof ArrayList) {
+                if (entry.getValue() instanceof ArrayList || entry.getValue() instanceof List) {
                     adRequestBuilder.addCustomTargeting((String) entry.getKey(), (List<String>)entry.getValue());
                 } else if (entry.getValue() instanceof String) {
                     adRequestBuilder.addCustomTargeting((String) entry.getKey(), (String)entry.getValue());

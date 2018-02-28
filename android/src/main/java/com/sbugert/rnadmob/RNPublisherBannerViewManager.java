@@ -167,10 +167,17 @@ class ReactPublisherAdView extends ReactViewGroup implements AppEventListener {
             Iterator entries = this.customTargeting.entrySet().iterator();
             while (entries.hasNext()) {
                 Map.Entry entry = (Map.Entry) entries.next();
-                if (entry.getValue() instanceof ArrayList || entry.getValue() instanceof List) {
+                if (entry.getValue() instanceof ArrayList) {
+                    Log.v("RNPublisherBannerViewManager", "______________ ArrayList");
+                    adRequestBuilder.addCustomTargeting((String) entry.getKey(), (List<String>)entry.getValue());
+                } else if (entry.getValue() instanceof List) {
+                    Log.v("RNPublisherBannerViewManager", "______________ List");
                     adRequestBuilder.addCustomTargeting((String) entry.getKey(), (List<String>)entry.getValue());
                 } else if (entry.getValue() instanceof String) {
+                    Log.v("RNPublisherBannerViewManager", "______________ String");
                     adRequestBuilder.addCustomTargeting((String) entry.getKey(), (String)entry.getValue());
+                } else {
+                    Log.v("RNPublisherBannerViewManager", "Custom Targeting: Type not supported");
                 }
             }
         }

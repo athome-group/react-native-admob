@@ -178,7 +178,7 @@ class ReactPublisherAdView extends ReactViewGroup implements AppEventListener {
                     Log.v("RNPublisherBannerViewManager", "______________ String");
                     adRequestBuilder.addCustomTargeting((String) entry.getKey(), (String)entry.getValue());
                 } else {
-                    Log.v("RNPublisherBannerViewManager", "Custom Targeting: Type not supported");
+                    Log.v("RNPublisherBannerViewManager", entry.getValue() + "Custom Targeting: Type" + entry.getValue().getClass().getName() +  "not supported");
                 }
             }
         }

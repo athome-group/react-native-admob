@@ -10,6 +10,8 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableNativeMap;
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMapKeySetIterator;
+import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.ReadableNativeArray;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.PixelUtil;
@@ -27,9 +29,11 @@ import com.google.android.gms.ads.doubleclick.PublisherAdView;
 
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Iterator;
+import android.util.Log;
 
 
 
@@ -164,14 +168,17 @@ class ReactPublisherAdView extends ReactViewGroup implements AppEventListener {
             Iterator entries = this.customTargeting.entrySet().iterator();
             while (entries.hasNext()) {
                 Map.Entry entry = (Map.Entry) entries.next();
-                adRequestBuilder.addCustomTargeting((String) entry.getKey(), (String) entry.getValue());
+                if (entry.getValue() instanceof ArrayList) {
+                    adRequestBuilder.addCustomTargeting((String) entry.getKey(), (List<String>)entry.getValue());
+                } else if (entry.getValue() instanceof String) {
+                    adRequestBuilder.addCustomTargeting((String) entry.getKey(), (String)entry.getValue());
+                } else {
+                    Log.v("RNPublisherBannerViewManager", "Custom Targeting: Type " + entry.getValue().getClass().getName() +  " is not supported");
+                }
             }
         }
         PublisherAdRequest adRequest = adRequestBuilder.build();
         this.adView.loadAd(adRequest);
-
-
-
     }
 
     public void setAdUnitID(String adUnitID) {

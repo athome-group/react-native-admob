@@ -14,6 +14,7 @@ static NSString *const kEventAdClosed = @"rewardedVideoAdClosed";
 static NSString *const kEventAdLeftApplication = @"rewardedVideoAdLeftApplication";
 static NSString *const kEventRewarded = @"rewardedVideoAdRewarded";
 static NSString *const kEventVideoStarted = @"rewardedVideoAdVideoStarted";
+static NSString *const kEventVideoCompleted = @"rewardedVideoAdVideoCompleted";
 
 @implementation RNAdMobRewarded
 {
@@ -45,7 +46,9 @@ RCT_EXPORT_MODULE();
              kEventAdOpened,
              kEventVideoStarted,
              kEventAdClosed,
-             kEventAdLeftApplication ];
+             kEventAdLeftApplication,
+             kEventVideoCompleted
+            ];
 }
 
 #pragma mark exported methods
@@ -136,6 +139,13 @@ RCT_EXPORT_METHOD(isReady:(RCTResponseSenderBlock)callback)
 {
     if (hasListeners) {
         [self sendEventWithName:kEventVideoStarted body:nil];
+    }
+}
+
+- (void)rewardBasedVideoAdDidCompletePlaying:(__unused GADRewardBasedVideoAd *)rewardBasedVideoAd
+{
+    if (hasListeners) {
+        [self sendEventWithName:kEventVideoCompleted body:nil];
     }
 }
 

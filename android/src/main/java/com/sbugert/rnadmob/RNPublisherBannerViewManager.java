@@ -161,7 +161,12 @@ class ReactPublisherAdView extends ReactViewGroup implements AppEventListener {
         final PublisherAdRequest.Builder adRequestBuilder = new PublisherAdRequest.Builder();
         if (testDevices != null) {
             for (int i = 0; i < testDevices.length; i++) {
-                adRequestBuilder.addTestDevice(testDevices[i]);
+                // adRequestBuilder.addTestDevice(testDevices[i]);
+                String testDevice = testDevices[i];
+                if (testDevice == "SIMULATOR") {
+                    testDevice = PublisherAdRequest.DEVICE_ID_EMULATOR;
+                }
+                adRequestBuilder.addTestDevice(testDevice);
             }
         }
         if (this.customTargeting != null) {
@@ -336,13 +341,13 @@ public class RNPublisherBannerViewManager extends ViewGroupManager<ReactPublishe
         }
     }
 
-    @Nullable
-    @Override
-    public Map<String, Object> getExportedViewConstants() {
-        final Map<String, Object> constants = new HashMap<>();
-        constants.put("simulatorId", PublisherAdRequest.DEVICE_ID_EMULATOR);
-        return constants;
-    }
+    // @Nullable
+    // @Override
+    // public Map<String, Object> getExportedViewConstants() {
+    //     final Map<String, Object> constants = new HashMap<>();
+    //     constants.put("simulatorId", PublisherAdRequest.DEVICE_ID_EMULATOR);
+    //     return constants;
+    // }
 
     @Nullable
     @Override

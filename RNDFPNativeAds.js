@@ -39,12 +39,13 @@ const addEventListener = (requestKey, event, handler) => {
     }
     _subscriptions[requestKey].set(handler, listener);
     return {
-      remove: () => removeEventListener(requestKey, event, handler)
+      remove: () => removeEventListener(requestKey, event, handler),
     };
   } else {
+    // eslint-disable-next-line no-console
     console.warn(`Trying to subscribe to unknown event: "${event}"`);
     return {
-      remove: () => {}
+      remove: () => { },
     };
   }
 };
@@ -69,5 +70,6 @@ export default {
   ...RNDFPNativeAds,
   addEventListener,
   removeEventListener,
-  removeAllListeners
+  removeAllListeners,
+  simulatorId: 'SIMULATOR'
 };

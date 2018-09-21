@@ -1,4 +1,5 @@
 #import "RNDFPNativeAds.h"
+#import "RNAdMobUtils.h"
 
 #if __has_include(<React/RCTUtils.h>)
 #import <React/RCTUtils.h>
@@ -90,7 +91,8 @@ RCT_EXPORT_MODULE();
 
 RCT_EXPORT_METHOD(setTestDevices:(NSArray *)testDevices)
 {
-    _testDevices = testDevices;
+    // _testDevices = testDevices;
+    _testDevices = RNAdMobProcessTestDevices(testDevices, kGADSimulatorID);
 }
 
 RCT_EXPORT_METHOD(setTemplateIDs:(NSArray *)templateIDs forRequestKey:(NSString *)requestKey)
@@ -171,12 +173,12 @@ RCT_EXPORT_METHOD(requestAds:(NSString *)requestKey forAdUnitIDs:(NSArray *)adUn
     
 }
 
-- (NSDictionary<NSString *,id> *)constantsToExport
-{
-    return @{
-             @"simulatorId": kGADSimulatorID
-             };
-}
+// - (NSDictionary<NSString *,id> *)constantsToExport
+// {
+//     return @{
+//              @"simulatorId": kGADSimulatorID
+//              };
+// }
 
 - (void)startObserving
 {

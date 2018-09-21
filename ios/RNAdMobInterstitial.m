@@ -1,4 +1,5 @@
 #import "RNAdMobInterstitial.h"
+#import "RNAdMobUtils.h"
 
 #if __has_include(<React/RCTUtils.h>)
 #import <React/RCTUtils.h>
@@ -28,6 +29,11 @@ static NSString *const kEventAdLeftApplication = @"interstitialAdLeftApplication
     return dispatch_get_main_queue();
 }
 
++ (BOOL)requiresMainQueueSetup
+{
+    return NO;
+}
+
 RCT_EXPORT_MODULE();
 
 - (NSArray<NSString *> *)supportedEvents
@@ -50,7 +56,8 @@ RCT_EXPORT_METHOD(setAdUnitID:(NSString *)adUnitID)
 
 RCT_EXPORT_METHOD(setTestDevices:(NSArray *)testDevices)
 {
-    _testDevices = testDevices;
+    // _testDevices = testDevices;
+    _testDevices = RNAdMobProcessTestDevices(testDevices, kGADSimulatorID);
 }
 
 RCT_EXPORT_METHOD(requestAd:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
@@ -89,12 +96,12 @@ RCT_EXPORT_METHOD(isReady:(RCTResponseSenderBlock)callback)
     callback(@[[NSNumber numberWithBool:[_interstitial isReady]]]);
 }
 
-- (NSDictionary<NSString *,id> *)constantsToExport
-{
-    return @{
-             @"simulatorId": kGADSimulatorID
-             };
-}
+// - (NSDictionary<NSString *,id> *)constantsToExport
+// {
+//     return @{
+//              @"simulatorId": kGADSimulatorID
+//              };
+// }
 
 - (void)startObserving
 {

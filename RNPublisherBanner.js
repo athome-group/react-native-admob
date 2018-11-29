@@ -69,11 +69,12 @@ class PublisherBanner extends Component {
   }
 }
 
-Object.defineProperty(PublisherBanner, "simulatorId", {
-  get() {
-    return UIManager.RNDFPBannerView.Constants.simulatorId;
-  }
-});
+// Object.defineProperty(PublisherBanner, "simulatorId", {
+//   get() {
+//     return UIManager.RNDFPBannerView.Constants.simulatorId;
+//   }
+// });
+PublisherBanner.simulatorId = 'SIMULATOR';
 
 PublisherBanner.propTypes = {
   ...ViewPropTypes,

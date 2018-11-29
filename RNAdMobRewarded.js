@@ -32,12 +32,13 @@ const addEventListener = (event, handler) => {
     }
     _subscriptions.set(handler, listener);
     return {
-      remove: () => removeEventListener(event, handler)
+      remove: () => removeEventListener(event, handler),
     };
   } else {
+    // eslint-disable-next-line no-console
     console.warn(`Trying to subscribe to unknown event: "${event}"`);
     return {
-      remove: () => {},
+      remove: () => { },
     };
   }
 };
@@ -63,4 +64,5 @@ export default {
   addEventListener,
   removeEventListener,
   removeAllListeners,
+  simulatorId: 'SIMULATOR'
 };

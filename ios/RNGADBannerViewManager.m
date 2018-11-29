@@ -21,10 +21,10 @@ RCT_EXPORT_MODULE();
     return [RNGADBannerView new];
 }
 
-- (dispatch_queue_t)methodQueue
-{
-    return dispatch_get_main_queue();
-}
+// - (dispatch_queue_t)methodQueue
+// {
+//     return dispatch_get_main_queue();
+// }
 
 RCT_EXPORT_METHOD(loadBanner:(nonnull NSNumber *)reactTag)
 {
@@ -50,11 +50,11 @@ RCT_EXPORT_VIEW_PROPERTY(onAdOpened, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onAdClosed, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onAdLeftApplication, RCTBubblingEventBlock)
 
-- (NSDictionary<NSString *,id> *)constantsToExport
-{
-    return @{
-             @"simulatorId": kGADSimulatorID
-             };
-}
+// - (NSDictionary<NSString *,id> *)constantsToExport
+// {
+//     return @{
+//              @"simulatorId": kGADSimulatorID
+//              };
+// }
 
 @end

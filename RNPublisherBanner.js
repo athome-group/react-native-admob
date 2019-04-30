@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import {
+  requireNativeComponent,
   UIManager,
   ViewPropTypes,
   findNodeHandle,
@@ -49,9 +50,7 @@ class PublisherBanner extends Component {
 
   handleAdFailedToLoad(event) {
     if (this.props.onAdFailedToLoad) {
-      this.props.onAdFailedToLoad(
-        createErrorFromErrorData(event.nativeEvent.error)
-      );
+      this.props.onAdFailedToLoad(createErrorFromErrorData(event.nativeEvent.error));
     }
   }
 
@@ -69,11 +68,7 @@ class PublisherBanner extends Component {
   }
 }
 
-Object.defineProperty(PublisherBanner, "simulatorId", {
-  get() {
-    return UIManager.RNDFPBannerView.Constants.simulatorId;
-  }
-});
+PublisherBanner.simulatorId = 'SIMULATOR';
 
 PublisherBanner.propTypes = {
   ...ViewPropTypes,

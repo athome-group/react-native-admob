@@ -14,5 +14,5 @@ module.exports = {
   },
   get DFPNativeAds() {
     return require('./RNDFPNativeAds').default;
-  },
+  }
 };

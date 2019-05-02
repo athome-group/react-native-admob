@@ -1,4 +1,5 @@
 #import "RNAdMobInterstitial.h"
+#import "RNAdMobUtils.h"
 
 #if __has_include(<React/RCTUtils.h>)
 #import <React/RCTUtils.h>
@@ -55,7 +56,7 @@ RCT_EXPORT_METHOD(setAdUnitID:(NSString *)adUnitID)
 
 RCT_EXPORT_METHOD(setTestDevices:(NSArray *)testDevices)
 {
-    _testDevices = testDevices;
+    _testDevices = RNAdMobProcessTestDevices(testDevices, kGADSimulatorID);
 }
 
 RCT_EXPORT_METHOD(requestAd:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
@@ -94,13 +95,6 @@ RCT_EXPORT_METHOD(isReady:(RCTResponseSenderBlock)callback)
     callback(@[[NSNumber numberWithBool:[_interstitial isReady]]]);
 }
 
-- (NSDictionary<NSString *,id> *)constantsToExport
-{
-    return @{
-             @"simulatorId": kGADSimulatorID
-             };
-}
-
 - (void)startObserving
 {
     hasListeners = YES;
@@ -118,10 +112,7 @@ RCT_EXPORT_METHOD(isReady:(RCTResponseSenderBlock)callback)
     if (hasListeners) {
         [self sendEventWithName:kEventAdLoaded body:nil];
     }
-
-    if (_requestAdResolve) {
-       _requestAdResolve(nil);
-    }
+    _requestAdResolve(nil);
 }
 
 - (void)interstitial:(__unused GADInterstitial *)interstitial didFailToReceiveAdWithError:(GADRequestError *)error
@@ -130,10 +121,7 @@ RCT_EXPORT_METHOD(isReady:(RCTResponseSenderBlock)callback)
         NSDictionary *jsError = RCTJSErrorFromCodeMessageAndNSError(@"E_AD_REQUEST_FAILED", error.localizedDescription, error);
         [self sendEventWithName:kEventAdFailedToLoad body:jsError];
     }
-
-    if (_requestAdReject) {
-        _requestAdReject(@"E_AD_REQUEST_FAILED", error.localizedDescription, error);
-    }
+    _requestAdReject(@"E_AD_REQUEST_FAILED", error.localizedDescription, error);
 }
 
 - (void)interstitialWillPresentScreen:(__unused GADInterstitial *)ad

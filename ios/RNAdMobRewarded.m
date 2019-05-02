@@ -92,13 +92,6 @@ RCT_EXPORT_METHOD(isReady:(RCTResponseSenderBlock)callback)
     callback(@[[NSNumber numberWithBool:[[GADRewardBasedVideoAd sharedInstance] isReady]]]);
 }
 
-- (NSDictionary<NSString *,id> *)constantsToExport
-{
-    return @{
-             @"simulatorId": kGADSimulatorID
-             };
-}
-
 - (void)startObserving
 {
     hasListeners = YES;

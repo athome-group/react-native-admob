@@ -86,8 +86,9 @@ public class RNAdMobRewardedVideoAdModule extends ReactContextBaseJavaModule imp
         sendEvent(EVENT_AD_LEFT_APPLICATION, null);
     }
 
-    @Override   
+    @Override
     public void onRewardedVideoCompleted() {
+        sendEvent(EVENT_VIDEO_COMPLETED, null);
     }
 
     @Override
@@ -153,7 +154,11 @@ public class RNAdMobRewardedVideoAdModule extends ReactContextBaseJavaModule imp
 
                     if (testDevices != null) {
                         for (int i = 0; i < testDevices.length; i++) {
-                            adRequestBuilder.addTestDevice(testDevices[i]);
+                            String testDevice = testDevices[i];
+                            if (testDevice == "SIMULATOR") {
+                                testDevice = AdRequest.DEVICE_ID_EMULATOR;
+                            }
+                            adRequestBuilder.addTestDevice(testDevice);
                         }
                     }
 

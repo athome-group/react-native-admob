@@ -186,6 +186,9 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
                         if (mTestDevices != null) {
                             for (int i = 0; i < mTestDevices.size(); i++) {
                                 String testDevice = mTestDevices.getString(i);
+                                if (testDevice == "SIMULATOR") {
+                                    testDevice = AdRequest.DEVICE_ID_EMULATOR;
+                                }
                                 publisherAdRequestBuilder.addTestDevice(testDevice);
                             }
                         }
@@ -484,11 +487,11 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
         return errMsg;
     }
 
-    @javax.annotation.Nullable
-    @Override
-    public Map<String, Object> getConstants() {
-        final Map<String, Object> constants = new HashMap<>();
-        constants.put("simulatorId", AdRequest.DEVICE_ID_EMULATOR);
-        return constants;
-    }
+    // @javax.annotation.Nullable
+    // @Override
+    // public Map<String, Object> getConstants() {
+    //     final Map<String, Object> constants = new HashMap<>();
+    //     constants.put("simulatorId", AdRequest.DEVICE_ID_EMULATOR);
+    //     return constants;
+    // }
 }

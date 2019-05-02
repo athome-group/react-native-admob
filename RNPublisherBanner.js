@@ -4,7 +4,6 @@ import {
   UIManager,
   ViewPropTypes,
   findNodeHandle,
-  ViewPropTypes,
  requireNativeComponent
 } from 'react-native';
 import { string, func, arrayOf } from 'prop-types';

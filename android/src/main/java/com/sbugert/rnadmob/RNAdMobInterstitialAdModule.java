@@ -80,10 +80,8 @@ public class RNAdMobInterstitialAdModule extends ReactContextBaseJavaModule {
                         WritableMap event = Arguments.createMap();
                         WritableMap error = Arguments.createMap();
                         event.putString("message", errorMessage);
-                        // Disable error reporting to JS because causing crash
-                        // TODO: properly debug this crash
-                        // sendEvent(EVENT_AD_FAILED_TO_LOAD, event);
-                        // mRequestAdPromise.reject(errorString, errorMessage);
+                        sendEvent(EVENT_AD_FAILED_TO_LOAD, event);
+                        mRequestAdPromise.reject(errorString, errorMessage);
                     }
                     @Override
                     public void onAdLeftApplication() {
@@ -132,7 +130,11 @@ public class RNAdMobInterstitialAdModule extends ReactContextBaseJavaModule {
                     AdRequest.Builder adRequestBuilder = new AdRequest.Builder();
                     if (testDevices != null) {
                         for (int i = 0; i < testDevices.length; i++) {
-                            adRequestBuilder.addTestDevice(testDevices[i]);
+                            String testDevice = testDevices[i];
+                            if (testDevice == "SIMULATOR") {
+                                testDevice = AdRequest.DEVICE_ID_EMULATOR;
+                            }
+                            adRequestBuilder.addTestDevice(testDevice);
                         }
                     }
                     AdRequest adRequest = adRequestBuilder.build();
@@ -165,13 +167,5 @@ public class RNAdMobInterstitialAdModule extends ReactContextBaseJavaModule {
                 callback.invoke(mInterstitialAd.isLoaded());
             }
         });
-    }
-
-    @javax.annotation.Nullable
-    @Override
-    public Map<String, Object> getConstants() {
-        final Map<String, Object> constants = new HashMap<>();
-        constants.put("simulatorId", AdRequest.DEVICE_ID_EMULATOR);
-        return constants;
     }
 }

@@ -32,10 +32,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import com.facebook.react.module.annotations.ReactModule;
 
+@ReactModule(name="RNDFPNativeAdsBridge")
 public class RNDFPNativeAds extends ReactContextBaseJavaModule {
 
-    private static final String REACT_CLASS = "RNDFPNativeAds";
+    private static final String REACT_CLASS = "RNDFPNativeAdsBridge";
 
     private static final int ERROR_CODE_INTERNAL_ERROR = 0;
     private static final int ERROR_CODE_INVALID_REQUEST = 1;

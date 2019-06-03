@@ -19,12 +19,14 @@ import com.google.android.gms.ads.reward.RewardedVideoAd;
 import com.google.android.gms.ads.reward.RewardedVideoAdListener;
 import com.google.android.gms.ads.reward.RewardItem;
 import com.google.android.gms.ads.AdRequest;
+import com.facebook.react.module.annotations.ReactModule;
 
 import java.util.ArrayList;
 
+@ReactModule(name="RNAdMobRewardedVideoAdBridge")
 public class RNAdMobRewardedVideoAdModule extends ReactContextBaseJavaModule implements RewardedVideoAdListener {
 
-    public static final String REACT_CLASS = "RNAdMobRewarded";
+    public static final String REACT_CLASS = "RNAdMobRewardedVideoAdBridge";
 
     public static final String EVENT_AD_LOADED = "rewardedVideoAdLoaded";
     public static final String EVENT_AD_FAILED_TO_LOAD = "rewardedVideoAdFailedToLoad";

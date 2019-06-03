@@ -32,10 +32,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import com.facebook.react.module.annotations.ReactModule;
 
+@ReactModule(name="RNDFPNativeAdsBridge")
 public class RNDFPNativeAds extends ReactContextBaseJavaModule {
 
-    private static final String REACT_CLASS = "RNDFPNativeAds";
+    private static final String REACT_CLASS = "RNDFPNativeAdsBridge";
 
     private static final int ERROR_CODE_INTERNAL_ERROR = 0;
     private static final int ERROR_CODE_INVALID_REQUEST = 1;
@@ -147,15 +149,12 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
     @ReactMethod
     public void requestAds(final String requestKey, ReadableArray dfpAdUnitIds, Promise requestKeyPromise) {
         if (TextUtils.isEmpty(requestKey) || ((dfpAdUnitIds == null || dfpAdUnitIds.size() == 0))) {
-            requestKeyPromise.reject(EVENT_ADS_INVALID_PARAMETERS,
-                MSG_ADS_INVALID_PARAMETERS,
-                null);
+            requestKeyPromise.reject(EVENT_ADS_INVALID_PARAMETERS);
             return;
         }
         if (mTemplateIDs.size() <= 0) {
             requestKeyPromise.reject(EVENT_ADS_NO_TEMPLATE_ID,
-                MSG_ADS_NO_TEMPLATE_ID,
-                null);
+                MSG_ADS_NO_TEMPLATE_ID);
             return;
         }
         if (!hasRequestLoading(requestKey)) {
@@ -229,7 +228,7 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
             requestKeyPromise.reject(EVENT_ADS_ALREADY_LOADING,
                 String.format(Locale.getDefault(),
                     MSG_ADS_ALREADY_LOADING,
-                    requestKey), null);
+                    requestKey));
         }
     }
 

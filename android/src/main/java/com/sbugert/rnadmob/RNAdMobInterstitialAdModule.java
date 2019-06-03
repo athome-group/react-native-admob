@@ -18,14 +18,15 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import com.facebook.react.module.annotations.ReactModule;
 
+@ReactModule(name="RNAdMobInterstitialAdBridge")
 public class RNAdMobInterstitialAdModule extends ReactContextBaseJavaModule {
 
-    public static final String REACT_CLASS = "RNAdMobInterstitial";
+    public static final String REACT_CLASS = "RNAdMobInterstitialAdBridge";
 
     public static final String EVENT_AD_LOADED = "interstitialAdLoaded";
     public static final String EVENT_AD_FAILED_TO_LOAD = "interstitialAdFailedToLoad";

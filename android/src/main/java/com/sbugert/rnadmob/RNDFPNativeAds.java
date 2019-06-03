@@ -149,15 +149,12 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
     @ReactMethod
     public void requestAds(final String requestKey, ReadableArray dfpAdUnitIds, Promise requestKeyPromise) {
         if (TextUtils.isEmpty(requestKey) || ((dfpAdUnitIds == null || dfpAdUnitIds.size() == 0))) {
-            requestKeyPromise.reject(EVENT_ADS_INVALID_PARAMETERS,
-                MSG_ADS_INVALID_PARAMETERS,
-                null);
+            requestKeyPromise.reject(EVENT_ADS_INVALID_PARAMETERS);
             return;
         }
         if (mTemplateIDs.size() <= 0) {
             requestKeyPromise.reject(EVENT_ADS_NO_TEMPLATE_ID,
-                MSG_ADS_NO_TEMPLATE_ID,
-                null);
+                MSG_ADS_NO_TEMPLATE_ID);
             return;
         }
         if (!hasRequestLoading(requestKey)) {
@@ -231,7 +228,7 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
             requestKeyPromise.reject(EVENT_ADS_ALREADY_LOADING,
                 String.format(Locale.getDefault(),
                     MSG_ADS_ALREADY_LOADING,
-                    requestKey), null);
+                    requestKey));
         }
     }
 

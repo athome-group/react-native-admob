@@ -3,7 +3,8 @@ import {
   requireNativeComponent,
   UIManager,
   ViewPropTypes,
-  findNodeHandle
+  findNodeHandle,
+ requireNativeComponent
 } from 'react-native';
 import { string, func, arrayOf } from 'prop-types';
 

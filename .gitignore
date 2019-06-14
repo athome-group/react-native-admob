@@ -59,6 +59,7 @@ node_modules/**/*
 
 # Android
 android/.idea/
+.idea/
 android/android.iml
 android/RNAdMob.iml
 android/gradle/

@@ -101,7 +101,7 @@ PublisherBanner.propTypes = {
   /**
    * DFP ad customt targeting obejct
    */
-  customTargeting: object,
+  customTargeting: Object,
 
   /**
    * Array of test devices. Use PublisherBanner.simulatorId for the simulator

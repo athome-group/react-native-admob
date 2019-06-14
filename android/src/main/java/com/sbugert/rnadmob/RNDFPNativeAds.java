@@ -37,7 +37,7 @@ import com.facebook.react.module.annotations.ReactModule;
 @ReactModule(name=RNDFPNativeAds.REACT_CLASS)
 public class RNDFPNativeAds extends ReactContextBaseJavaModule {
 
-    private static final String REACT_CLASS = "RNDFPNativeAds";
+    public static final String REACT_CLASS = "RNDFPNativeAds";
 
     private static final int ERROR_CODE_INTERNAL_ERROR = 0;
     private static final int ERROR_CODE_INVALID_REQUEST = 1;

@@ -23,10 +23,10 @@ import com.facebook.react.module.annotations.ReactModule;
 
 import java.util.ArrayList;
 
-@ReactModule(name="RNAdMobRewardedVideoAdBridge")
+@ReactModule(name=RNAdMobRewardedVideoAdModule.REACT_CLASS)
 public class RNAdMobRewardedVideoAdModule extends ReactContextBaseJavaModule implements RewardedVideoAdListener {
 
-    public static final String REACT_CLASS = "RNAdMobRewardedVideoAdBridge";
+    public static final String REACT_CLASS = "RNAdMobRewardedVideoAdModule";
 
     public static final String EVENT_AD_LOADED = "rewardedVideoAdLoaded";
     public static final String EVENT_AD_FAILED_TO_LOAD = "rewardedVideoAdFailedToLoad";

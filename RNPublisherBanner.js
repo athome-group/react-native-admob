@@ -28,7 +28,7 @@ class PublisherBanner extends Component {
   loadBanner() {
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this._bannerView),
-      UIManager.RNDFPBannerView.Commands.loadBanner,
+        UIManager.getViewManagerConfig('RNDFPBannerView').loadBanner(),
       null,
     );
   }

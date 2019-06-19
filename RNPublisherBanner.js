@@ -26,19 +26,23 @@ class PublisherBanner extends Component {
   }
 
   loadBanner() {
-    const nodeHandle = findNodeHandle(this._bannerView);
-    if(nodeHandle === undefined || nodeHandle === null) {
+    try {
+      const nodeHandle = findNodeHandle(this._bannerView);
+      if(nodeHandle === undefined || nodeHandle === null) {
+        return;
+      }
+      const viewManager = UIManager.RNDFPBannerView.Commands.loadBanner;
+      if(viewManager === undefined || viewManager === null) {
+        return;
+      }
+      UIManager.dispatchViewManagerCommand(
+        nodeHandle,
+        viewManager,
+        null,
+      );
+    } catch (error) {
       return;
     }
-    const viewManager = UIManager.RNDFPBannerView.Commands.loadBanner;
-    if(viewManager === undefined || viewManager === null) {
-      return;
-    }
-    UIManager.dispatchViewManagerCommand(
-      nodeHandle,
-      viewManager,
-      null,
-    );
   }
 
   handleSizeChange(event) {

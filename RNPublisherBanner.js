@@ -30,7 +30,7 @@ class PublisherBanner extends Component {
     if(nodeHandle === undefined || nodeHandle === null) {
       return;
     }
-    const viewManager = UIManager.getViewManagerConfig('RNDFPBannerView').Commands.loadBanner;
+    const viewManager = UIManager.RNDFPBannerView.Commands.loadBanner;
     if(viewManager === undefined || viewManager === null) {
       return;
     }

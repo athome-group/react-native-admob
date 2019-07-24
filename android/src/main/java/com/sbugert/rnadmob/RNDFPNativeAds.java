@@ -176,7 +176,10 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
                 }
                 mProcessingNativeCustomTemplateAds.get(requestKey).put(unitId, true);
                 final AdLoader adLoader = getAdLoader(unitId, templateId, requestKey);
-                mAdLoaders.get(requestKey).put(unitId, false);
+                HashMap<String, Boolean> adLoaderMap = mAdLoaders.get(requestKey);
+                if (adLoaderMap != null) {
+                    mAdLoaders.get(requestKey).put(unitId, false);
+                }
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
@@ -221,8 +224,6 @@ public class RNDFPNativeAds extends ReactContextBaseJavaModule {
                         sendOnAdsStartingLoading(requestKey, unitId);
                     }
                 });
-                // }
-                //}
             }
         } else {
             requestKeyPromise.reject(EVENT_ADS_ALREADY_LOADING,

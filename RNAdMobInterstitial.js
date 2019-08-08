@@ -5,9 +5,9 @@ import {
 
 import { createErrorFromErrorData } from './utils';
 
-const RNAdMobInterstitial = NativeModules.RNAdMobInterstitial;
+const RNAdMobInterstitialAdModule = NativeModules.RNAdMobInterstitialAdModule;
 
-const eventEmitter = new NativeEventEmitter(RNAdMobInterstitial);
+const eventEmitter = new NativeEventEmitter(RNAdMobInterstitialAdModule);
 
 const eventMap = {
   adLoaded: 'interstitialAdLoaded',
@@ -58,7 +58,7 @@ const removeAllListeners = () => {
 };
 
 export default {
-  ...RNAdMobInterstitial,
+  ...RNAdMobInterstitialAdModule,
   addEventListener,
   removeEventListener,
   removeAllListeners,

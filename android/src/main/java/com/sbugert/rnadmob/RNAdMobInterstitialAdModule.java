@@ -26,7 +26,7 @@ import com.facebook.react.module.annotations.ReactModule;
 @ReactModule(name=RNAdMobInterstitialAdModule.REACT_CLASS)
 public class RNAdMobInterstitialAdModule extends ReactContextBaseJavaModule {
 
-    public static final String REACT_CLASS = "RNAdMobInterstitialAdModule";
+    public static final String REACT_CLASS = "RNAdMobInterstitial";
 
     public static final String EVENT_AD_LOADED = "interstitialAdLoaded";
     public static final String EVENT_AD_FAILED_TO_LOAD = "interstitialAdFailedToLoad";

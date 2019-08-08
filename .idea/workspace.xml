@@ -4,6 +4,7 @@
     <list default="true" id="693b9783-2ff6-455b-90ef-1cccb411ced1" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RNAdMobInterstitial.js" beforeDir="false" afterPath="$PROJECT_DIR$/RNAdMobInterstitial.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/sbugert/rnadmob/RNAdMobInterstitialAdModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/sbugert/rnadmob/RNAdMobInterstitialAdModule.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -105,7 +106,8 @@
       <workItem from="1560860398425" duration="310000" />
       <workItem from="1560947974235" duration="30000" />
       <workItem from="1563968341505" duration="620000" />
-      <workItem from="1565255586650" duration="244000" />
+      <workItem from="1565255586650" duration="551000" />
+      <workItem from="1565257254105" duration="130000" />
     </task>
     <task id="LOCAL-00001" summary="Fix Merge issue">
       <created>1559722236102</created>
@@ -191,7 +193,14 @@
       <option name="project" value="LOCAL" />
       <updated>1563968460630</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Fix interstitial call">
+      <created>1565255899892</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1565255899892</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -253,7 +262,8 @@
     <MESSAGE value="delete pbx proj RNADmobUtils double entry" />
     <MESSAGE value="fix method call" />
     <MESSAGE value="fix https://console.firebase.google.com/project/athome-lu-mobile/crashlytics/app/android:lu.athome/issues/9296bfa50c14ab943e2e7075e7ded517?time=last-thirty-days&amp;sessionId=5D36BC9D035C000129A86BB7491C67BE_DNE_0_v2" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix https://console.firebase.google.com/project/athome-lu-mobile/crashlytics/app/android:lu.athome/issues/9296bfa50c14ab943e2e7075e7ded517?time=last-thirty-days&amp;sessionId=5D36BC9D035C000129A86BB7491C67BE_DNE_0_v2" />
+    <MESSAGE value="Fix interstitial call" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix interstitial call" />
   </component>
   <component name="masterDetails">
     <states>

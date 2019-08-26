@@ -20,5 +20,17 @@
     "eslint": "^5.16.0",
     "eslint-plugin-react": "^7.13.0"
 
-  }
+  },
+  "files": [
+    "android",
+    "ios",
+    "index.js",
+    "RNAdMobBanner.js",
+    "RNAdMobInterstitial.js",
+    "RNAdMobRewarded.js",
+    "RNDFPNativeAds.js",
+    "RNPublisherBanner.js",
+    "utils.js",
+    "react-native-admob.podspec"
+  ]
 }

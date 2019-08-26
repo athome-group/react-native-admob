@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="693b9783-2ff6-455b-90ef-1cccb411ced1" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/react-native-admob.podspec" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/react-native-admob.podspec" beforeDir="false" afterPath="$PROJECT_DIR$/react-native-admob.podspec" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -107,7 +108,8 @@
       <workItem from="1563968341505" duration="620000" />
       <workItem from="1565255586650" duration="551000" />
       <workItem from="1565257254105" duration="158000" />
-      <workItem from="1566543130912" duration="220000" />
+      <workItem from="1566543130912" duration="273000" />
+      <workItem from="1566824725973" duration="617000" />
     </task>
     <task id="LOCAL-00001" summary="Fix Merge issue">
       <created>1559722236102</created>
@@ -207,7 +209,14 @@
       <option name="project" value="LOCAL" />
       <updated>1565257391311</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="add podspec file according to RN 0.60+ requirements">
+      <created>1566543422088</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1566543422088</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -270,7 +279,8 @@
     <MESSAGE value="fix method call" />
     <MESSAGE value="fix https://console.firebase.google.com/project/athome-lu-mobile/crashlytics/app/android:lu.athome/issues/9296bfa50c14ab943e2e7075e7ded517?time=last-thirty-days&amp;sessionId=5D36BC9D035C000129A86BB7491C67BE_DNE_0_v2" />
     <MESSAGE value="Fix interstitial call" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix interstitial call" />
+    <MESSAGE value="add podspec file according to RN 0.60+ requirements" />
+    <option name="LAST_COMMIT_MESSAGE" value="add podspec file according to RN 0.60+ requirements" />
   </component>
   <component name="masterDetails">
     <states>

@@ -14,6 +14,6 @@ Pod::Spec.new do |s|
 
   s.source       = { :git => "https://github.com/athome-group/react-native-admob.git", :tag => "v#{s.version}" }
   s.source_files  = "ios/**/*.{h,m}"
-
   s.dependency 'React'
+  s.dependency 'Google-Mobile-Ads-SDK'
 end

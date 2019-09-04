@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="693b9783-2ff6-455b-90ef-1cccb411ced1" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/react-native-admob.podspec" beforeDir="false" afterPath="$PROJECT_DIR$/react-native-admob.podspec" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/RNDFPNativeAds.m" beforeDir="false" afterPath="$PROJECT_DIR$/ios/RNDFPNativeAds.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -34,11 +36,16 @@
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="eslint.code.style.apply.dismiss" value="true" />
     <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.standard" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.standard" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.standard" value="" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RunDashboard">
@@ -90,7 +97,11 @@
       <workItem from="1565257254105" duration="158000" />
       <workItem from="1566543130912" duration="273000" />
       <workItem from="1566824725973" duration="1163000" />
-      <workItem from="1566914389027" duration="111000" />
+      <workItem from="1566914389027" duration="175000" />
+      <workItem from="1567513802612" duration="1066000" />
+      <workItem from="1567579960811" duration="2632000" />
+      <workItem from="1567585036442" duration="62000" />
+      <workItem from="1567602056674" duration="228000" />
     </task>
     <task id="LOCAL-00001" summary="Fix Merge issue">
       <created>1559722236102</created>
@@ -204,7 +215,14 @@
       <option name="project" value="LOCAL" />
       <updated>1566825565852</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="Update podspecs with Google-Mobile-Ads-SDK dependency">
+      <created>1566914582790</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1566914582790</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -269,7 +287,8 @@
     <MESSAGE value="Fix interstitial call" />
     <MESSAGE value="add podspec file according to RN 0.60+ requirements" />
     <MESSAGE value="Update package.json according to standards" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update package.json according to standards" />
+    <MESSAGE value="Update podspecs with Google-Mobile-Ads-SDK dependency" />
+    <option name="LAST_COMMIT_MESSAGE" value="Update podspecs with Google-Mobile-Ads-SDK dependency" />
   </component>
   <component name="masterDetails">
     <states>

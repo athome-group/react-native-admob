@@ -7,13 +7,13 @@
   "license": "BSD-2-Clause",
   "repository": {
     "type": "git",
-    "url": "git@github.com:sbugert/react-native-admob.git"
+    "url": "https://github.com/athome-group/react-native-admob.git"
   },
   "dependencies": {
     "prop-types": "^15.7.2"
   },
   "peerDependencies": {
-    "react-native": ">=0.57.8"
+    "react-native": "0.60.5"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.1",

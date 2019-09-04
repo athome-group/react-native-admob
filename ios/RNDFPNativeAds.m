@@ -16,13 +16,18 @@
 static char RequestKey;
 
 @implementation GADAdLoader(requestKey)
+
+
+
 - (NSString *)requestKey
 {
+    NSLog(@"GADAdLoader(requestKey) requestKey" );
     return objc_getAssociatedObject(self, &RequestKey);
 }
 
 - (void)setRequestKey:(NSString *)requestKey
 {
+    NSLog(@"GADAdLoader(requestKey) requestKey %@" ,requestKey );
     objc_setAssociatedObject(self, &RequestKey, requestKey, OBJC_ASSOCIATION_COPY);
 }
 
@@ -129,48 +134,53 @@ RCT_EXPORT_METHOD(isNativeAdLoading:(NSString *)key unitID:(NSString *)unitID ca
 // each call of this method creates a new request group of GADAdLoaders
 RCT_EXPORT_METHOD(requestAds:(NSString *)requestKey forAdUnitIDs:(NSArray *)adUnitIDs resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
-    if (requestKey.length == 0 || adUnitIDs.count == 0) {
-        reject(@"E_ADS_INVALID_PARAMETERS", @"Please provide non empty requestKey and adUnitIDs", nil);
-        return;
-    }
-    
-    if (![self requestLoading:requestKey]) {
-        [_convertedAds setObject:@{}.mutableCopy forKey:requestKey];
-        [_adLoaders setObject:@{}.mutableCopy forKey:requestKey];
-        [_adUnitIDs setObject:adUnitIDs forKey:requestKey];
-        
-        [_requestAdsResolves setObject:resolve forKey:requestKey];
-        [_requestAdsRejects setObject:reject forKey:requestKey];
-        
-        // TODO: expose options to be configurable
-        GADMultipleAdsAdLoaderOptions *multipleAdsOptions = [[GADMultipleAdsAdLoaderOptions alloc] init];
-        multipleAdsOptions.numberOfAds = 1;
-        
-        GADNativeAdImageAdLoaderOptions *imageAdLoaderOptions = [[GADNativeAdImageAdLoaderOptions alloc] init];
-        imageAdLoaderOptions.disableImageLoading = true;
-        
-        for (NSString *adUnitID in adUnitIDs) {
-            GADAdLoader *adLoader = [[GADAdLoader alloc] initWithAdUnitID:adUnitID
-                                                       rootViewController:[[UIViewController alloc] init]
-                                                                  adTypes:@[kGADAdLoaderAdTypeNativeCustomTemplate]
-                                                                  options:@[multipleAdsOptions, imageAdLoaderOptions]];
-            adLoader.delegate = self;
-            adLoader.requestKey = requestKey;
-            [_adLoaders[requestKey] setObject:adLoader forKey:adUnitID];
-            
-            DFPRequest *request = [DFPRequest request];
-            request.testDevices = _testDevices;
-            request.customTargeting = _customTargetings[requestKey];
-            [adLoader loadRequest:request];
-            
-            if (hasListeners) {
-                [self sendEventWithName:kEventAdStartLoading body:@{kRequestKey:requestKey, kAdUnitID: adUnitID}];
-            }
+    @try {
+        if (requestKey.length == 0 || adUnitIDs.count == 0) {
+            reject(@"E_ADS_INVALID_PARAMETERS", @"Please provide non empty requestKey and adUnitIDs", nil);
+            return;
         }
-    } else {
-        reject(@"E_ADS_ALREADY_LOADING", [NSString stringWithFormat: @"Ads with request key %@ are already loading.", requestKey], nil);
+        if (![self requestLoading:requestKey]) {
+            [_convertedAds setObject:@{}.mutableCopy forKey:requestKey];
+            [_adLoaders setObject:@{}.mutableCopy forKey:requestKey];
+            [_adUnitIDs setObject:adUnitIDs forKey:requestKey];
+
+            [_requestAdsResolves setObject:resolve forKey:requestKey];
+            [_requestAdsRejects setObject:reject forKey:requestKey];
+
+            // TODO: expose options to be configurable
+            GADMultipleAdsAdLoaderOptions *multipleAdsOptions = [[GADMultipleAdsAdLoaderOptions alloc] init];
+            multipleAdsOptions.numberOfAds = 1;
+
+            GADNativeAdImageAdLoaderOptions *imageAdLoaderOptions = [[GADNativeAdImageAdLoaderOptions alloc] init];
+            imageAdLoaderOptions.disableImageLoading = true;
+
+            for (NSString *adUnitID in adUnitIDs) {
+                GADAdLoader *adLoader = [[GADAdLoader alloc] initWithAdUnitID:adUnitID
+                                                           rootViewController:[[UIViewController alloc] init]
+                                                                      adTypes:@[kGADAdLoaderAdTypeNativeCustomTemplate]
+                                                                      options:@[multipleAdsOptions, imageAdLoaderOptions]];
+                adLoader.delegate = self;
+                adLoader.requestKey = requestKey;
+                [_adLoaders[requestKey] setObject:adLoader forKey:adUnitID];
+
+                DFPRequest *request = [DFPRequest request];
+                request.testDevices = _testDevices;
+                request.customTargeting = _customTargetings[requestKey];
+                [adLoader loadRequest:request];
+
+                if (hasListeners) {
+                    [self sendEventWithName:kEventAdStartLoading body:@{kRequestKey:requestKey, kAdUnitID: adUnitID}];
+                }
+            }
+        } else {
+            NSLog(@"RNAdMob::RequestAds else");
+            reject(@"E_ADS_ALREADY_LOADING", [NSString stringWithFormat: @"Ads with request key %@ are already loading.", requestKey], nil);
+        }
+    } @catch (NSException *exception) {
+        NSLog(@"RNAdMob::RequestAds error desription: %@",  exception);
+        reject(@"E_ADS_ALREADY_LOADING", [NSString stringWithFormat: @"RNAdMob::RequestAds error %@ ", exception], nil);
     }
-    
+
 }
 
 // - (NSDictionary<NSString *,id> *)constantsToExport
@@ -194,40 +204,44 @@ RCT_EXPORT_METHOD(requestAds:(NSString *)requestKey forAdUnitIDs:(NSArray *)adUn
 
 - (void)adLoader:(GADAdLoader *)adLoader
 didReceiveNativeCustomTemplateAd:(GADNativeCustomTemplateAd *)nativeCustomTemplateAd {
-    NSString *requestKey = adLoader.requestKey;
-    
-    if (nativeCustomTemplateAd) {
-        if (!_nativeCustomTemplateAds[requestKey]) {
-            [_nativeCustomTemplateAds setObject:@{}.mutableCopy forKey:requestKey];
+    @try{
+        NSString *requestKey = adLoader.requestKey;
+
+        if (nativeCustomTemplateAd) {
+            if (!_nativeCustomTemplateAds[requestKey]) {
+                [_nativeCustomTemplateAds setObject:@{}.mutableCopy forKey:requestKey];
+            }
+            [_nativeCustomTemplateAds[requestKey] setObject:nativeCustomTemplateAd forKey:adLoader.adUnitID];
         }
-        [_nativeCustomTemplateAds[requestKey] setObject:nativeCustomTemplateAd forKey:adLoader.adUnitID];
-    }
-    
-    NSMutableDictionary *ad = @{}.mutableCopy;
-    
-    for (NSString *key in nativeCustomTemplateAd.availableAssetKeys) {
-        if ([nativeCustomTemplateAd stringForKey:key]) {
-            [ad setValue:[nativeCustomTemplateAd stringForKey:key] forKey:key];
+
+        NSMutableDictionary *ad = @{}.mutableCopy;
+
+        for (NSString *key in nativeCustomTemplateAd.availableAssetKeys) {
+            if ([nativeCustomTemplateAd stringForKey:key]) {
+                [ad setValue:[nativeCustomTemplateAd stringForKey:key] forKey:key];
+            }
+            else if ([nativeCustomTemplateAd imageForKey:key]) {
+                [ad setValue:[[nativeCustomTemplateAd imageForKey:key] imageURL].absoluteString forKey:key];
+            }
         }
-        else if ([nativeCustomTemplateAd imageForKey:key]) {
-            [ad setValue:[[nativeCustomTemplateAd imageForKey:key] imageURL].absoluteString forKey:key];
-        }
-    }
-    [_convertedAds[requestKey] setObject:ad forKey:adLoader.adUnitID];
-    
-    if (hasListeners) {
-        [self sendEventWithName:kEventAdLoaded body:@{kRequestKey:requestKey, kAdUnitID: adLoader.adUnitID, @"ad":ad}];
-    }
-    
-    [nativeCustomTemplateAd recordImpression];
-    
-    if ([self allAdsFinished:requestKey]) {
+        [_convertedAds[requestKey] setObject:ad forKey:adLoader.adUnitID];
+
         if (hasListeners) {
-            [self sendEventWithName:kEventAllAdsFinished body:@{kRequestKey:requestKey, @"ads":_convertedAds[requestKey]}];
+            [self sendEventWithName:kEventAdLoaded body:@{kRequestKey:requestKey, kAdUnitID: adLoader.adUnitID, @"ad":ad}];
         }
-        
-        _requestAdsResolves[requestKey](_convertedAds[requestKey]);
-        [self internalCleanUp:requestKey];
+
+        [nativeCustomTemplateAd recordImpression];
+
+        if ([self allAdsFinished:requestKey]) {
+            if (hasListeners) {
+                [self sendEventWithName:kEventAllAdsFinished body:@{kRequestKey:requestKey, @"ads":_convertedAds[requestKey]}];
+            }
+
+            _requestAdsResolves[requestKey](_convertedAds[requestKey]);
+            [self internalCleanUp:requestKey];
+        }
+    } @catch (NSException *exception) {
+        NSLog(@"RNAdMob::didReceiveNativeCustomTemplateAd error", @"error description", exception);
     }
 }
 
@@ -239,22 +253,26 @@ didReceiveNativeCustomTemplateAd:(GADNativeCustomTemplateAd *)nativeCustomTempla
 #pragma mark GADAdLoaderDelegate implementation
 
 - (void)adLoader:(GADAdLoader *)adLoader didFailToReceiveAdWithError:(GADRequestError *)error {
-    NSString *requestKey = adLoader.requestKey;
-    
-    NSDictionary *jsError = RCTJSErrorFromCodeMessageAndNSError(@"E_AD_REQUEST_FAILED", error.localizedDescription, error);
-    if (hasListeners) {
-        [self sendEventWithName:kEventAdFailedToLoad body:@{kRequestKey:requestKey, kAdUnitID: adLoader.adUnitID, @"error":jsError}];
-    }
-    // TODO: can set in dictionary the error object
-    [_convertedAds[requestKey] setObject:@{} forKey:adLoader.adUnitID];
-    
-    if ([self allAdsFailed:requestKey]) {
+    @try {
+        NSString *requestKey = adLoader.requestKey;
+
+        NSDictionary *jsError = RCTJSErrorFromCodeMessageAndNSError(@"E_AD_REQUEST_FAILED", error.localizedDescription, error);
         if (hasListeners) {
-            [self sendEventWithName:kEventAllAdsFinished body:@{kRequestKey:requestKey, @"error":jsError}];
+            [self sendEventWithName:kEventAdFailedToLoad body:@{kRequestKey:requestKey, kAdUnitID: adLoader.adUnitID, @"error":jsError}];
         }
-        
-        _requestAdsRejects[requestKey](@"E_ADS_REQUEST_FAILED", error.localizedDescription, error);
-        [self internalCleanUp:requestKey];
+        // TODO: can set in dictionary the error object
+        [_convertedAds[requestKey] setObject:@{} forKey:adLoader.adUnitID];
+
+        if ([self allAdsFailed:requestKey]) {
+            if (hasListeners) {
+                [self sendEventWithName:kEventAllAdsFinished body:@{kRequestKey:requestKey, @"error":jsError}];
+            }
+
+            _requestAdsRejects[requestKey](@"E_ADS_REQUEST_FAILED", error.localizedDescription, error);
+            [self internalCleanUp:requestKey];
+        }
+    } @catch (NSException *exception) {
+        NSLog(@"RNAdMob::adLoader error", @"error description", exception);
     }
 }
 
@@ -288,7 +306,7 @@ didReceiveNativeCustomTemplateAd:(GADNativeCustomTemplateAd *)nativeCustomTempla
     if (_convertedAds[requestKey].allValues.count != _adUnitIDs[requestKey].count) {
         return false;
     }
-    
+
     for (NSDictionary *ad in _convertedAds[requestKey].allValues) {
         if (ad.count != 0) {
             return false;

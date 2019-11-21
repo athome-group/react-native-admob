@@ -19,5 +19,5 @@ android {
 dependencies {
     implementation "com.facebook.react:react-native:+"
     implementation 'com.google.android.gms:play-services-ads:+'
-    implementation 'com.intellij:annotations:+@jar'
+    implementation "androidx.annotation:annotation:1.1.0"
 }

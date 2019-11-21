@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="693b9783-2ff6-455b-90ef-1cccb411ced1" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/RNDFPNativeAds.m" beforeDir="false" afterPath="$PROJECT_DIR$/ios/RNDFPNativeAds.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -102,6 +99,8 @@
       <workItem from="1567579960811" duration="2632000" />
       <workItem from="1567585036442" duration="62000" />
       <workItem from="1567602056674" duration="228000" />
+      <workItem from="1567604240952" duration="256000" />
+      <workItem from="1570435296437" duration="995000" />
     </task>
     <task id="LOCAL-00001" summary="Fix Merge issue">
       <created>1559722236102</created>
@@ -222,7 +221,14 @@
       <option name="project" value="LOCAL" />
       <updated>1566914582790</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="Secure code with try catch">
+      <created>1567604264052</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1567604264052</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -288,7 +294,8 @@
     <MESSAGE value="add podspec file according to RN 0.60+ requirements" />
     <MESSAGE value="Update package.json according to standards" />
     <MESSAGE value="Update podspecs with Google-Mobile-Ads-SDK dependency" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update podspecs with Google-Mobile-Ads-SDK dependency" />
+    <MESSAGE value="Secure code with try catch" />
+    <option name="LAST_COMMIT_MESSAGE" value="Secure code with try catch" />
   </component>
   <component name="masterDetails">
     <states>

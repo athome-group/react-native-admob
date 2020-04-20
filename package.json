@@ -3,6 +3,7 @@
   "version": "2.0.3",
   "description": "A react-native component for Google AdMob banners and interstitials",
   "author": "Simon Bugert <simon.bugert@gmail.com>",
+  "homepage": "https://github.com/athome-group/react-native-admob",
   "main": "index.js",
   "license": "BSD-2-Clause",
   "repository": {
